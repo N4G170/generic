@@ -1,0 +1,17 @@
+-> v0.05
+    Influence wars added
+    Implemented Perlin Noise algorithm based on the paper/implementation by Ken Perlin http://mrl.nyu.edu/~perlin/noise/ http://mrl.nyu.edu/~perlin/paper445.pdf
+-> V0.04
+    A* Map demo added
+    Imported and adapted my a* implementation
+-> V0.03.1
+    (Solar System demo)
+        Added elliptical orbit with higher difference between minor and major axis, as well as its own rotation (much like earths orbit, it moves).
+        Added another planet (earth like orbit) with a natural satellite. The satellite positioning is suffering from float int cast errors, in relation to its planet position.
+-> V0.03
+    Solar System demo created with central star and two planets in orbit. Both planets minor and major axis have the same ratio as the periapsis(minor) and apoapsis(major)
+    of Mercury and Venus.
+-> V0.02
+    Snake demo added
+-> V0.01
+    Initial release with base program structure and rain demo
