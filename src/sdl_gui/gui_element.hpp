@@ -1,5 +1,6 @@
 #include <SDL2/SDL.h>
 #include <list>
+#include "gui_transform.hpp"
 
 namespace sdl_gui
 {
@@ -19,9 +20,6 @@ enum AnchorType
     BOTTOM_CENTRE,
     BOTTOM_RIGHT
 };
-
-struct Position { int x, y; };
-struct Dimensions { int w, h; };
 
 class GuiElement
 {
@@ -43,38 +41,28 @@ class GuiElement
         GuiElement& operator= (GuiElement&& other) noexcept;
 
         /* < Pure Virtual Funtions > */
-        virtual void Render() = 0;
-        virtual void Render(SDL_Renderer* renderer) = 0;
         virtual void Logic() = 0;
+        virtual void Render() = 0;
+        virtual void Render(SDL_Renderer* renderer_ptr) = 0;
         /* </ Pure Virtual Funtions > */
 
-
-
         /* < Getters / Setters > */
-        void X(int x){ m_position.x = x; }
-        int X() const { return m_position.x; }
-        void Y(int y){ m_position.y = y; }
-        int Y() const { return m_position.y; }
-
-        void Width(int width){ m_dimensions.w = width; }
-        int Width() const { return m_dimensions.w; }
-        void Height(int height){ m_dimensions.h = height; }
-        int Height() const { return m_dimensions.h; }
-
-        void ZIndex(int z_index){ m_zindex = z_index; }
-        int ZIndex() const { return m_zindex; }
+        void ZIndex(int z_index){ m_z_index = z_index; }
+        int ZIndex() const { return m_z_index; }
         /* </ Getters / Setters > */
 
     protected:
         // vars and stuff
+        GuiTransform m_transform;
         Position m_position;
         Dimensions m_dimensions;
+
         // AnchorType m_anchor_type;
-        int m_zindex;
+        int m_z_index;
 
         SDL_Renderer* m_renderer_ptr;
 
-        // GuiElement* m_parent;
+        GuiElement* m_parent;
         // std::list<GuiElement*> m_children;
 };
 

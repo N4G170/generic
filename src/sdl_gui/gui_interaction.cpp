@@ -5,7 +5,12 @@
 namespace sdl_gui
 {
 
-GuiInteraction::GuiInteraction()
+GuiInteraction::GuiInteraction(): m_active{true}
+{
+
+}
+
+GuiInteraction::GuiInteraction(bool active): m_active{active}
 {
 
 }
@@ -15,7 +20,7 @@ GuiInteraction::~GuiInteraction() noexcept
 
 }
 
-GuiInteraction::GuiInteraction(const GuiInteraction& other)
+GuiInteraction::GuiInteraction(const GuiInteraction& other): m_colliders{other.m_colliders}, m_active{other.m_active}
 {
 
 }
@@ -54,8 +59,7 @@ void GuiInteraction::AddGuiCollider(int centre_x, int centre_y, int circle_radiu
 
 bool GuiInteraction::MouseInsideCollider(int mouse_x, int mouse_y)
 {
-
-    for(const GuiCollider& collider : m_colliders)
+    for(GuiCollider& collider : m_colliders)
     {
         if(collider.IsPointColliding(mouse_x, mouse_y))
             return true;

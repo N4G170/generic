@@ -64,8 +64,8 @@ void Menu::Render(SDL_Renderer* renderer, float delta_time)
     SDL_SetRenderDrawColor( renderer, Colour::Grey.r, Colour::Grey.g, Colour::Grey.b, Colour::Grey.a );
     SDL_RenderClear( renderer );
 
-    // SDL_SetRenderDrawColor( renderer, Colour::Storm_Petrel.r, Colour::Storm_Petrel.g, Colour::Storm_Petrel.b, 128);
-    SDL_SetRenderDrawColor( renderer, 255,255,255,255);
+    SDL_SetRenderDrawColor( renderer, Colour::Storm_Petrel.r, Colour::Storm_Petrel.g, Colour::Storm_Petrel.b, 128);
+    // SDL_SetRenderDrawColor( renderer, 128,255,255,255);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     SDL_Rect aux_rect{10,10,200,100};
     SDL_RenderFillRect(renderer, &aux_rect);

@@ -3,6 +3,7 @@
 #include "label.hpp"
 #include "gui_image.hpp"
 #include <map>
+#include <memory>
 
 namespace sdl_gui
 {
@@ -54,19 +55,29 @@ class Button : public GuiElement, public GuiInteraction
             TEXTURE
         };
 
+        enum MouseFlags
+        {
+            NONE = 0,
+            MOUSE_ENTER = 1,
+            MOUSE_EXIT = 2,
+            MOUSE_HOVER = 4,
+            MOUSE_UP = 8,
+            MOUSE_DOWN = 16,
+        };
+
     private:
         // vars and stuff
-        Label* m_label_ptr;
-        GuiImage* m_image;
+        std::unique_ptr<Label> m_label;
+        std::map<ButtonStatus, std::unique_ptr<GuiImage>> m_status_images;
+        std::map<ButtonStatus, SDL_Colour> m_status_colours;
 
         TransitionType m_transition_type;
+        GuiImage* m_current_image;
+        SDL_Colour m_current_colour;
 
-        //flags
-        bool m_mouse_enter;
-        bool m_mouse_exit;
-        bool m_mouse_hover;
-        bool m_mouse_down;
-
+        //mouse flags
+        int m_mouse_flags;
+        bool m_allow_click;
 };
 
 #endif //BUTTON_HPP
