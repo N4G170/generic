@@ -11,7 +11,7 @@
 class Rain : public StateInterface
 {
     public:
-        Rain(StateMachine* state_machine, const std::string& state_name);
+        Rain(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr);
 
         /**
          * \brief Precess SDL user input

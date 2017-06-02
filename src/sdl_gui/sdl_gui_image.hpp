@@ -1,36 +1,36 @@
 #include <SDL2/SDL.h>
-#include "gui_element.hpp"
+#include "sdl_gui_element.hpp"
 #include <string>
 #include <memory>
 
 namespace sdl_gui
 {
 
-#ifndef GUI_IMAGE_HPP
-#define GUI_IMAGE_HPP
+#ifndef SDL_GUI_IMAGE_HPP
+#define SDL_GUI_IMAGE_HPP
 
-class GuiImage : public GuiElement
+class Image : public GuiElement
 {
     public:
         /* Base constructor */
-        GuiImage(SDL_Renderer* renderer_ptr, const std::string& texture_path);
+        Image(ResourceManager* resource_manager_ptr, SDL_Renderer* renderer_ptr, const std::string& texture_path);
         /* Default destructor */
-        virtual ~GuiImage() noexcept;
+        virtual ~Image() noexcept;
 
         /* Copy constructor */
-        GuiImage(const GuiImage& other);
+        Image(const Image& other);
         /* Move constructor */
-        GuiImage(GuiImage&& other) noexcept;
+        Image(Image&& other) noexcept;
 
         /* Copy operator */
-        GuiImage& operator= (const GuiImage& other);
+        Image& operator= (const Image& other);
         /* Move operator */
-        GuiImage& operator= (GuiImage&& other) noexcept;
+        Image& operator= (Image&& other) noexcept;
 
         /* < Overrides GUIElement > */
-        void Render();
-        void Render(SDL_Renderer* renderer_ptr);
-        void Logic();
+        void Render(float delta_time);
+        void Render(SDL_Renderer* renderer_ptr, float delta_time);
+        void Logic(float fixed_delta_time);
         /* </ Overrides > */
 
 

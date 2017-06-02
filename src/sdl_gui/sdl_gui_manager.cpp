@@ -1,4 +1,4 @@
-#include "gui_manager.hpp"
+#include "sdl_gui_manager.hpp"
 #include <utility>
 
 GuiManager::GuiManager()

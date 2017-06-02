@@ -35,7 +35,7 @@ class Font
 {
     public:
         /* Default constructor */
-        Font(SDL_Renderer* renderer_ptr, const std::string& font_path, int fot_size = 12);
+        Font(SDL_Renderer* renderer_ptr, const std::string& font_path, int font_size = 12);
         /* Default destructor */
         virtual ~Font() noexcept;
 

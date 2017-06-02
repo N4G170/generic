@@ -4,36 +4,36 @@
 #include "utils.hpp"
 #include "message_writer.hpp"
 
-MapDemo::MapDemo(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font):StateInterface(state_machine, state_name), m_mouse_inside_viewport{false},
+MapDemo::MapDemo(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr):StateInterface(state_machine, state_name, resource_manager_ptr), m_mouse_inside_viewport{false},
 m_map_width{0}, m_map_height{0}, m_scale{1}, m_mouse_hover_cell_index{-1}, m_selected_cell_index{-1}, m_army_selected{false}
 {
     m_infobox.Config(nullptr, window_width - 275, 50, 250, 350);
     m_infobox.SetBgColour();
 
     int x{10}; int y{5}; int base_spacing{15};
-    m_infobox.CreateLabel(LabelsId::BR1, renderer, font, x, y, "-------------------------", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::TITLE, renderer, font, x, y, "A* Map", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::MOUSE_POSITION, renderer, font, x, y, "Mouse", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::CURRENT_CELL, renderer, font, x, y, "Cell: -1 - (-1,-1)", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::L2, renderer, font, x, y, "L2", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::L3, renderer, font, x, y, "L3", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::L4, renderer, font, x, y, "L4", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::BR2, renderer, font, x, y, "-------------------------", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::SELECTED_CELL, renderer, font, x, y, "No Cell selected", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::ARMY, renderer, font, x, y, "No Army Selected", Colour::Black);
-    y += 100;
-    m_infobox.CreateLabel(LabelsId::BR3, renderer, font, x, y, "-------------------------", Colour::Black);
-    y += base_spacing;
-    m_infobox.CreateLabel(LabelsId::BACK, renderer, font, x, y, "'ESC' - Back to menu", Colour::Black);
+    // m_infobox.CreateLabel(LabelsId::BR1, renderer, font, x, y, "-------------------------", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::TITLE, renderer, font, x, y, "A* Map", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::MOUSE_POSITION, renderer, font, x, y, "Mouse", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::CURRENT_CELL, renderer, font, x, y, "Cell: -1 - (-1,-1)", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::L2, renderer, font, x, y, "L2", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::L3, renderer, font, x, y, "L3", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::L4, renderer, font, x, y, "L4", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::BR2, renderer, font, x, y, "-------------------------", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::SELECTED_CELL, renderer, font, x, y, "No Cell selected", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::ARMY, renderer, font, x, y, "No Army Selected", Colour::Black);
+    // y += 100;
+    // m_infobox.CreateLabel(LabelsId::BR3, renderer, font, x, y, "-------------------------", Colour::Black);
+    // y += base_spacing;
+    // m_infobox.CreateLabel(LabelsId::BACK, renderer, font, x, y, "'ESC' - Back to menu", Colour::Black);
 
     m_inner_box_viewport.Position(51, 51);
     m_inner_box_viewport.Width(1399);

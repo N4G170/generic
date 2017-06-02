@@ -2,8 +2,8 @@
 #include "constants.hpp"
 #include "random.hpp"
 
-SolarSystem::SolarSystem(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font): StateInterface(state_machine, state_name), m_show_orbit{true},
-    m_pause{false}
+SolarSystem::SolarSystem(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr):
+    StateInterface(state_machine, state_name, resource_manager_ptr), m_show_orbit{true}, m_pause{false}
 {
     //generate random backgroud stars
     int total_stars = Random(50, 250);
@@ -100,5 +100,5 @@ void SolarSystem::Render(SDL_Renderer* renderer, float delta_time)
     m_xeno.Render(renderer, delta_time);
 
     for(sdl_gui::Label* label : m_labels)
-        label->Render();
+        label->Render(delta_time);
 }

@@ -4,7 +4,7 @@
 #include <map>
 // #include <initializer_list>
 #include "object.hpp"
-#include "label.hpp"
+#include "sdl_gui_label.hpp"
 #include "constants.hpp"
 
 // struct LabelInitData

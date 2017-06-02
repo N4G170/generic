@@ -8,14 +8,11 @@
 #include "influence_wars.hpp"
 #include <iostream>
 
-StateMachine::StateMachine(SDL_Renderer* renderer, TTF_Font* font, bool* quit_flag)
+StateMachine::StateMachine(SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr, bool* quit_flag): m_quit_flag{quit_flag},
+    m_renderer_ptr{renderer_ptr}, m_resource_manager_ptr{resource_manager_ptr}
 {
     m_previous_state.reset(nullptr);
     m_current_state.reset(nullptr);
-
-    m_renderer_ptr = renderer;
-    m_quit_flag = quit_flag;
-    m_font = font;
 }
 
 StateMachine::~StateMachine()
@@ -24,6 +21,8 @@ StateMachine::~StateMachine()
     m_current_state.reset(nullptr);
 
     m_renderer_ptr = nullptr;
+    m_resource_manager_ptr = nullptr;
+    m_quit_flag = nullptr;
 }
 
 /**
@@ -48,27 +47,27 @@ void StateMachine::ChangeState(const std::string& state)
     //select next state
     if(state == StateName::Menu)
     {
-        m_current_state.reset(new Menu(this, StateName::Menu, m_renderer_ptr, m_font));
+        m_current_state.reset(new Menu(this, StateName::Menu, m_renderer_ptr, m_resource_manager_ptr));
     }
     else if(state == StateName::Rain)
     {
-        m_current_state.reset(new Rain(this, StateName::Rain));
+        m_current_state.reset(new Rain(this, StateName::Rain, m_renderer_ptr, m_resource_manager_ptr));
     }
     else if(state == StateName::Snake)
     {
-        m_current_state.reset(new SnakeGame(this, StateName::Snake, m_renderer_ptr, m_font));
+        m_current_state.reset(new SnakeGame(this, StateName::Snake, m_renderer_ptr, m_resource_manager_ptr));
     }
     else if(state == StateName::Solar_System)
     {
-        m_current_state.reset(new SolarSystem(this, StateName::Solar_System, m_renderer_ptr, m_font));
+        m_current_state.reset(new SolarSystem(this, StateName::Solar_System, m_renderer_ptr, m_resource_manager_ptr));
     }
     else if(state == StateName::Map_Demo)
     {
-        m_current_state.reset(new MapDemo(this, StateName::Map_Demo, m_renderer_ptr, m_font));
+        m_current_state.reset(new MapDemo(this, StateName::Map_Demo, m_renderer_ptr, m_resource_manager_ptr));
     }
     else if(state == StateName::Influence_Wars)
     {
-        m_current_state.reset(new InfluenceWars(this, StateName::Influence_Wars, m_renderer_ptr, m_font));
+        m_current_state.reset(new InfluenceWars(this, StateName::Influence_Wars, m_renderer_ptr, m_resource_manager_ptr));
     }
 }
 

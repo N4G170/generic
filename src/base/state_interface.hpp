@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 
 #include "state_machine.hpp"
+#include "sdl_gui_resource_manager.hpp"
 
 class StateMachine;
 struct MainFlags;
@@ -14,9 +15,9 @@ struct MainFlags;
 class StateInterface
 {
     public:
-        StateInterface(StateMachine* state_machine, const std::string& state_name):m_state_machine_ptr{state_machine},
-        m_state_name{state_name} {};
-        virtual ~StateInterface(){ m_state_machine_ptr = nullptr; };
+        StateInterface(StateMachine* state_machine, const std::string& state_name, sdl_gui::ResourceManager* resource_manager_ptr):m_state_machine_ptr{state_machine},
+        m_resource_manager_ptr{resource_manager_ptr}, m_state_name{state_name} {};
+        virtual ~StateInterface(){ m_state_machine_ptr = nullptr; m_resource_manager_ptr = nullptr; };
 
         // StateInterface(const StateInterface& other):m_state_machine_ptr{other.m_state_machine_ptr},
         // m_state_name{other.m_state_name} {};
@@ -35,7 +36,7 @@ class StateInterface
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float delta_time = 1) = 0;
+        virtual void Logic(float fixed_delta_time = 1) = 0;
 
         /**
          * \brief Render the state visual elements
@@ -56,6 +57,7 @@ class StateInterface
 
     protected:
         StateMachine* m_state_machine_ptr;
+        sdl_gui::ResourceManager* m_resource_manager_ptr;
     private:
         std::string m_state_name;
 };

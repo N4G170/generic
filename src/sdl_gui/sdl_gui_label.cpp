@@ -1,22 +1,21 @@
-#include "label.hpp"
+#include "sdl_gui_label.hpp"
 #include <utility>
 #include <iostream>
 
 namespace sdl_gui
 {
 
-Label::Label():m_text_texture{nullptr}, m_text{""}, m_text_colour{}, m_font_ptr{nullptr}
+Label::Label():m_text_texture{nullptr}, m_bg_texture{nullptr}, m_text{""}, m_text_colour{}, m_font_ptr{nullptr}
 {
     m_renderer_ptr = nullptr;
 }
 
-Label::Label(SDL_Renderer* renderer_ptr, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position, Dimensions dimensions):
-    GuiElement{renderer_ptr, position, dimensions}, m_text_texture{nullptr}, m_text{text}, m_text_colour{text_colour}
+Label::Label(ResourceManager* resource_manager_ptr, SDL_Renderer* renderer_ptr, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position, Dimensions dimensions):
+    GuiElement{resource_manager_ptr, renderer_ptr, position, dimensions}, m_text_texture{nullptr}, m_text{text}, m_text_colour{text_colour}
 {
 
     m_font_ptr = new Font(renderer_ptr, font_path, font_size);
-    m_dimensions.w = 250;
-    m_dimensions.h = 50;
+    m_transform.BaseDimensions({250,50});
     // m_position_and_size.w = w;
     // m_position_and_size.h = h;
 
@@ -68,19 +67,19 @@ Label& Label::operator=(Label&& other) noexcept
 }
 
 /* < Overrides GUIElement > */
-void Label::Render()
+void Label::Render(float delta_time)
 {
-    SDL_Rect dst{ m_position.x, m_position.y, m_dimensions.w, m_dimensions.h };
+    SDL_Rect dst{ m_transform.RenderRect() };
     SDL_RenderCopy(m_renderer_ptr, m_text_texture, nullptr, &dst);
 }
 
-void Label::Render(SDL_Renderer* renderer)
+void Label::Render(SDL_Renderer* renderer, float delta_time)
 {
-    SDL_Rect dst{ m_position.x, m_position.y, m_dimensions.w, m_dimensions.h };
+    SDL_Rect dst{ m_transform.RenderRect() };
     SDL_RenderCopy(renderer, m_text_texture, nullptr, &dst);
 }
 
-void Label::Logic()
+void Label::Logic(float fixed_delta_time)
 {
 
 }

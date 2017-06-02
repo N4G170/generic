@@ -8,7 +8,7 @@
 class InfluenceWars : public  StateInterface
 {
     public:
-        InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font);
+        InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
         virtual ~InfluenceWars() noexcept;
         // InfluenceWars(const InfluenceWars& other);
         // InfluenceWars(InfluenceWars&& other) noexcept;

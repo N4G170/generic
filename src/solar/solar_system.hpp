@@ -4,7 +4,7 @@
 #include <vector>
 #include "state_interface.hpp"
 #include "vector2.hpp"
-#include "label.hpp"
+#include "sdl_gui_label.hpp"
 
 #include "celestial_body.hpp"
 #include "xeno.hpp"
@@ -14,7 +14,7 @@
 class SolarSystem : public StateInterface
 {
     public:
-        SolarSystem(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font);
+        SolarSystem(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
         virtual ~SolarSystem();
 
         /**

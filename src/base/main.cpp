@@ -41,7 +41,7 @@ struct SDLDeleters
     }
 };
 
-bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<SDL_Renderer, SDLDeleters>& renderer, std::unique_ptr<TTF_Font, SDLDeleters>& font)
+bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<SDL_Renderer, SDLDeleters>& renderer)
 {
     //Initialize SDL
     int result = SDL_Init( SDL_INIT_VIDEO | SDL_INIT_AUDIO );
@@ -100,8 +100,6 @@ bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<S
                     }
                     else
                     {
-                        font.reset( TTF_OpenFont( font_path.c_str(), font_size ) );
-
                         //Initialize SDL_mixer - 44100 standard frequency(CD), 2 channels (stereo)
                         if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
                         {
@@ -117,10 +115,9 @@ bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<S
     return true;
 }
 
-void TerminateSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<SDL_Renderer, SDLDeleters>& renderer, std::unique_ptr<TTF_Font, SDLDeleters>& font)
+void TerminateSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<SDL_Renderer, SDLDeleters>& renderer)
 {
     //keep this order
-    font.reset( nullptr );
     renderer.reset( nullptr );
     window.reset( nullptr );
 
@@ -134,38 +131,38 @@ void TerminateSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_
 
 // </f>
 
-ResourceManager* rm = nullptr;
-#include "gui_collider.hpp"
-#include "label.hpp"
+#include "sdl_gui_collider.hpp"
+#include "sdl_gui_label.hpp"
 #include "shapes.hpp"
+#include "sdl_gui_resource_manager.hpp"
+
 
 // <f> MAIN
 int main(int argc, char *argv[])
 {
     std::unique_ptr<SDL_Window, SDLDeleters> window;
     std::unique_ptr<SDL_Renderer, SDLDeleters> renderer;
-    std::unique_ptr<TTF_Font, SDLDeleters> font;
 
     //init SDL subsystems
-    bool init_result = InitSDL(window, renderer, font);
+    bool init_result = InitSDL(window, renderer);
 
     if(!init_result)
     {
         //failed to initialize sdl
 
         //terminate any initialized sdl subsystems
-        TerminateSDL(window, renderer, font);
+        TerminateSDL(window, renderer);
 
         return -2;
     }
     else
     {
         // ResourceManager resource_manager(renderer.get());
-        rm = new ResourceManager(renderer.get());
+        sdl_gui::ResourceManager resource_manager{renderer.get()};
 
         bool quit{false};
         //initializes the first state that will run
-        StateMachine state_machine {renderer.get(), font.get(), &quit};
+        StateMachine state_machine {renderer.get(), &resource_manager, &quit};
         state_machine.ChangeState(StateName::Menu);
 
         //Create Event handler
@@ -261,9 +258,7 @@ int main(int argc, char *argv[])
     }
 
     //Terminate SDL and clear "global" pointers
-    TerminateSDL(window, renderer, font);
-
-    delete(rm);
+    TerminateSDL(window, renderer);
 
     return 0;
 }

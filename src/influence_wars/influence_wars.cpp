@@ -91,7 +91,8 @@ PerlinNoise noise_obj_e1(Random(0,256));
 //VORONOI
 struct Data{};
 
-InfluenceWars::InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font): StateInterface(state_machine, state_name)
+InfluenceWars::InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr):
+    StateInterface(state_machine, state_name, resource_manager_ptr)
 {
     Draw(renderer);
 

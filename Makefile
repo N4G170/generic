@@ -10,6 +10,8 @@ SRC_INFLUENCE_WARS_PATH=src/influence_wars/
 SRC_GUI_PATH=src/sdl_gui/
 
 OBJ_PATH=objects/
+GUI_OBJ_PATH=objects/gui/
+GUI_OBJ_DIR=objects/gui/
 BIN_PATH=./
 EXEC_FILE=generic_sdl
 
@@ -39,11 +41,16 @@ RAIN_OBJECTS:=$(patsubst $(SRC_RAIN_PATH)%.cpp,$(OBJ_PATH)%.o,$(wildcard $(SRC_R
 SOLAR_OBJECTS:=$(patsubst $(SRC_SOLAR_PATH)%.cpp,$(OBJ_PATH)%.o,$(wildcard $(SRC_SOLAR_PATH)*.cpp))
 GRID_MAP_OBJECTS:=$(patsubst $(SRC_GRID_MAP_PATH)%.cpp,$(OBJ_PATH)%.o,$(wildcard $(SRC_GRID_MAP_PATH)*.cpp))
 INFLUENCE_WARS_OBJECTS:=$(patsubst $(SRC_INFLUENCE_WARS_PATH)%.cpp,$(OBJ_PATH)%.o,$(wildcard $(SRC_INFLUENCE_WARS_PATH)*.cpp))
-GUI_OBJECTS:=$(patsubst $(SRC_GUI_PATH)%.cpp,$(OBJ_PATH)%.o,$(wildcard $(SRC_GUI_PATH)*.cpp))
+GUI_OBJECTS:=$(patsubst $(SRC_GUI_PATH)%.cpp,$(GUI_OBJ_PATH)%.o,$(wildcard $(SRC_GUI_PATH)*.cpp))
 
 #recipes - this method only recompiles changed files
-all: $(BASE_OBJECTS) $(SNAKE_OBJECTS) $(RAIN_OBJECTS) $(SOLAR_OBJECTS) $(GRID_MAP_OBJECTS) $(INFLUENCE_WARS_OBJECTS) $(GUI_OBJECTS)
-	$(CXX) $(LDFLAGS) $(OBJ_PATH)*.o -o $(BIN_PATH)$(EXEC_FILE)
+all: build | $(GUI_OBJ_DIR)
+
+build:$(BASE_OBJECTS) $(SNAKE_OBJECTS) $(RAIN_OBJECTS) $(SOLAR_OBJECTS) $(GRID_MAP_OBJECTS) $(INFLUENCE_WARS_OBJECTS) $(GUI_OBJECTS)
+	$(CXX) $(LDFLAGS) $(OBJ_PATH)*.o $(GUI_OBJ_PATH)*.o -o $(BIN_PATH)$(EXEC_FILE)
+
+$(GUI_OBJ_DIR) :
+	mkdir -p $(GUI_OBJ_PATH)
 
 $(BASE_OBJECTS):$(OBJ_PATH)%.o:$(SRC_BASE_PATH)%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
@@ -57,8 +64,8 @@ $(GRID_MAP_OBJECTS):$(OBJ_PATH)%.o:$(SRC_GRID_MAP_PATH)%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 $(INFLUENCE_WARS_OBJECTS):$(OBJ_PATH)%.o:$(SRC_INFLUENCE_WARS_PATH)%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
-$(GUI_OBJECTS):$(OBJ_PATH)%.o:$(SRC_GUI_PATH)%.cpp
+$(GUI_OBJECTS):$(GUI_OBJ_PATH)%.o:$(SRC_GUI_PATH)%.cpp
 	$(CXX) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm $(OBJ_PATH)* $(EXEC_FILE)
+	rm $(OBJ_PATH)*.o $(GUI_OBJ_PATH)*.o $(EXEC_FILE)

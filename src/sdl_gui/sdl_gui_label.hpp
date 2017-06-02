@@ -1,13 +1,13 @@
 #include <string>
 #include "SDL2/SDL.h"
-#include "gui_element.hpp"
+#include "sdl_gui_element.hpp"
 #include "font.hpp"
 
 namespace sdl_gui
 {
 
-#ifndef LABEL_HPP
-#define LABEL_HPP
+#ifndef SDL_GUI_LABEL_HPP
+#define SDL_GUI_LABEL_HPP
 
 class Label : public GuiElement
 {
@@ -15,7 +15,7 @@ class Label : public GuiElement
         /* Default constructor */
         Label();
 
-        Label(SDL_Renderer* renderer, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position, Dimensions dimensions);
+        Label(ResourceManager* resource_manager_ptr, SDL_Renderer* renderer, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position, Dimensions dimensions);
 
         /* Default destructor */
         virtual ~Label() noexcept;
@@ -31,13 +31,13 @@ class Label : public GuiElement
         Label& operator= (Label&& other) noexcept;
 
         /* < Overrides GUIElement > */
-        void Render();
-        void Render(SDL_Renderer* renderer);
-        void Logic();
+        virtual void Render(float delta_time);
+        virtual void Render(SDL_Renderer* renderer_ptr, float delta_time);
+        virtual void Logic(float fixed_delta_time);
         /* </ Overrides > */
 
         std::string Text();
-        void Text(const std::string& text, SDL_Colour text_colour);
+        virtual void Text(const std::string& text, SDL_Colour text_colour);
 
     private:
         /**

@@ -6,7 +6,7 @@
 #include <utility>
 #include "constants.hpp"
 #include "state_interface.hpp"
-#include "label.hpp"
+#include "sdl_gui_label.hpp"
 
 using Point = std::pair<int,int>;
 
@@ -15,7 +15,7 @@ enum Direction{ UP, DOWN, LEFT, RIGHT };
 class SnakeGame : public StateInterface
 {
     public:
-        SnakeGame(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font);
+        SnakeGame(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
         virtual ~SnakeGame();
 
         /**

@@ -2,7 +2,7 @@
 #define MAP_DEMO_HPP
 
 #include <vector>
-#include "label.hpp"
+#include "sdl_gui_label.hpp"
 #include "state_interface.hpp"
 #include "cell.hpp"
 #include "army.hpp"
@@ -32,7 +32,7 @@ class MapDemo : public StateInterface
     };
 
     public:
-        MapDemo(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font);
+        MapDemo(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
         ~MapDemo();
         /**
          * \brief Precess SDL user input

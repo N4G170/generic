@@ -2,16 +2,17 @@
 #define MENU_HPP
 
 #include <vector>
+#include <memory>
 #include "state_interface.hpp"
-#include "button.hpp"
+#include "sdl_gui_button.hpp"
+#include "sdl_gui_container_box.hpp"
 
 class Menu : public StateInterface
 {
     public:
-        Menu(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, TTF_Font* font);
+        Menu(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr);
 
         virtual ~Menu();
-
         /**
          * \brief Precess SDL user input
          */
@@ -20,7 +21,7 @@ class Menu : public StateInterface
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float delta_time = 1);
+        virtual void Logic(float fixed_delta_time = 1);
 
         /**
          * \brief Render the state visual elements
@@ -28,6 +29,9 @@ class Menu : public StateInterface
         virtual void Render(SDL_Renderer*, float delta_time);
 
     private:
-        std::vector<sdl_gui::Button*> m_buttons;
+        std::vector<std::unique_ptr<sdl_gui::Button>> m_buttons;
+        sdl_gui::ContainerBox m_container_box;
+
+        void ChangeStateCallback(const std::string& state);
 };
 #endif //MENU_HPP

@@ -1,7 +1,7 @@
 #include "rain.hpp"
 #include <iostream>
 
-Rain::Rain(StateMachine* state_machine, const std::string& state_name):StateInterface(state_machine, state_name)
+Rain::Rain(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr):StateInterface(state_machine, state_name, resource_manager_ptr)
 {
     m_bg_colour = Colour::Storm_Petrel;
     m_drop_sound = Mix_LoadWAV("data/sfx/drop.wav");

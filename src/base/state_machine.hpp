@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <sdl_gui_resource_manager.hpp>
 
 #include "state_interface.hpp"
 //class ResourceManager;
@@ -16,14 +16,14 @@ class StateInterface;
 class StateMachine
 {
     public:
-        StateMachine(SDL_Renderer* renderer, TTF_Font* font, bool* quit_flag);
+        StateMachine(SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr, bool* quit_flag);
         virtual ~StateMachine();
 
         /**
          * \brief Sets next state
          * \details Receives a string with the name for the next state. (Might change it to an enumerate)
          */
-        void ChangeState(const std::string&);
+        void ChangeState(const std::string& state);
         /**
          * \brief Returns the machine to its previous state (Not yet in use)
          */
@@ -45,13 +45,13 @@ class StateMachine
         void Render(float delta_time);
 
         bool* m_quit_flag;
-        TTF_Font* m_font;
     protected:
     private:
         /**
          * \brief Just a shortcut for the resource manager owned renderer
          */
         SDL_Renderer* m_renderer_ptr;
+        sdl_gui::ResourceManager* m_resource_manager_ptr;
 
         std::unique_ptr<StateInterface> m_current_state;
         std::unique_ptr<StateInterface> m_previous_state;

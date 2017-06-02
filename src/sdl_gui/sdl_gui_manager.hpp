@@ -1,5 +1,5 @@
-#ifndef GUI_MANAGER_HPP
-#define GUI_MANAGER_HPP
+#ifndef SDL_GUI_MANAGER_HPP
+#define SDL_GUI_MANAGER_HPP
 
 class GuiManager
 {
