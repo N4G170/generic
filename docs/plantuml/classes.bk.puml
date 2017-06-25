@@ -1,0 +1,37 @@
+@startuml
+'Inheritance
+GuiElement <|-- BaseButton
+IGuiRender <|-- BaseButton
+IGuiInteraction <|-- BaseButton
+BaseButton <|-- Button
+BaseButton <|-- Checkbox
+
+GuiElement <|-- ContainerBox
+IGuiRender <|-- ContainerBox
+IGuiInteraction <|-- ContainerBox
+
+GuiElement <|-- Dialog
+IGuiRender <|-- Dialog
+IGuiInteraction <|-- Dialog
+
+GuiElement <|-- Label
+IGuiRender <|-- Label
+
+'GuiElement <|-- "Panel(Not ready)"
+
+GuiElement <|-- ProgressBar
+IGuiRender <|-- ProgressBar
+IGuiInteraction <|-- ProgressBar
+ProgressBar <|-- Slider
+
+GuiElement <|-- Textbox
+IGuiRender <|-- Textbox
+IGuiInteraction <|-- Textbox
+
+'Composition
+GuiElement *-- Transform
+
+'METHODS AND VARIABLES
+'GuiElement
+
+@enduml
