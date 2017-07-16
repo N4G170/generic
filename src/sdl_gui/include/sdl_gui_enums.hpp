@@ -18,56 +18,67 @@ enum class AnchorType
 };
 // </f>
 
-//<f> IGuiInteraction
+//<f> Interaction
 
+/**
+ * \brief Button transition states
+ */
 enum class ButtonState
 {
-    INACTIVE,
-    ACTIVE,
-    HOVER,
-    DOWN
+    INACTIVE,   ///< Button is inactive, cannot be interacted with
+    ACTIVE,     ///< Button is active, can be interacted with
+    OVER,      ///< Button has "something"(usually mouse) hovering it
+    PRESSED     ///< Button was pressed
 };
 
-enum class ButtonTransitionType
+/**
+ * \brief Base mouse interaction flags
+ */
+enum class MouseStateFlags
 {
-    COLOUR,
-    TEXTURE
+    NONE = 0,               ///< Clear state
+    ENTER = 1,        ///< Mouse entered the detection area
+    EXIT = 2,         ///< Mouse left the detection area
+    OVER = 4,        ///< Mouse is inside the detection area
 };
-
-enum MouseFlags
+/**
+ * \brief Mouse button interaction state flags
+ */
+enum class InputKeyStateFlags
 {
-    NONE = 0,
-    MOUSE_ENTER = 1,
-    MOUSE_EXIT = 2,
-    MOUSE_HOVER = 4,
-    MOUSE_UP = 8,
-    MOUSE_DOWN = 16,
-    MOUSE_HOLD_DOWN = 32
+    NONE = 0,     ///< Empty state
+    UP = 1,       ///< Key up
+    DOWN = 2,     ///< Key down
+    HOLD = 4,     ///< Key holding down
 };
 
+/**
+ * \brief Mouse actions available for use with callbacks
+ */
 enum class MouseCallbackType
 {
-    ACTIVE,
-    INACTIVE,
-
-    HOVER,
-    DOWN,
-    HOLD,
-    CLICK,
-    UP,
-    ENTER,
-    EXIT,
+    ENTER,      ///< Mouse entered detection area
+    OVER,      ///< Mouse is inside detection area
+    EXIT,       ///< Mouse left detection area
+};
+/**
+ * \brief Mouse button actions available for use with callbacks
+ */
+enum class InputKeyCallbackType
+{
+    DOWN,   ///< Mouse button down
+    HOLD,   ///< Mouse button holding down
+    CLICK,  ///< Mouse button clicked
+    UP,     ///< Mouse button up
 };
 
 // </f>
 
-//<f> ContainerBox
-enum class ContainerWrapMode
+//<f> Layout
+enum class LayoutWrapMode
 {
-    NONE,
-    CROP,
-    WRAP_HEIGHT,
-    WRAP_WIDTH
+    LAYOUT_OVERFLOW,//OVERFLOW already defined in cmath and the compiler complains so added LAYOUT_
+    LAYOUT_HIDDEN
 };
 //</f>
 
@@ -82,10 +93,10 @@ enum class CheckBoxGroupType
 //<f> ProgressBar
 enum class ProgressBarDirection
 {
-    LEFT,
-    RIGHT,
-    UP,
-    DOWN
+    LEFT,   ///< Bar fills right->left
+    RIGHT,  ///< Bar fills left->right
+    UP,     ///< Bar fills bottom->up
+    DOWN    ///< Bar fills top->down
 };
 //</f>
 #endif// SDL_GUI_ENUMS

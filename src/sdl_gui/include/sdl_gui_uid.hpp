@@ -27,7 +27,14 @@ struct BitSetSize;
 template< std::size_t S >
 struct BitSetSize< std::bitset< S > > : std::integral_constant< std::size_t, S > {};
 
+/**
+ * \brief Generates a new IID (simple counter). Thread safe
+ */
 IID GenerateLocalID(IDType type = IDType::GLOBAL);
+
+/**
+ * \brief Generates a new UID (custom algorithm). Thread safe
+ */
 UID GenerateUID();
 
 #endif//SDL_GUI_UID_HPP

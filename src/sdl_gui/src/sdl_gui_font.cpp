@@ -24,13 +24,25 @@ Font::~Font() noexcept
 
 Font::Font(Font&& other) noexcept
 {
+    m_renderer_ptr = std::move(other.m_renderer_ptr);
     m_source_path = std::move(other.m_source_path);
+    m_font_size = std::move(other.m_font_size);
+    m_max_glyph_w = std::move(other.m_max_glyph_w);
+    m_line_spacing = std::move(other.m_line_spacing);
+    m_font_texture = std::move(other.m_font_texture);
 }
 
 Font& Font::operator=(Font&& other) noexcept
 {
-    this->m_renderer_ptr = std::move(other.m_renderer_ptr);
-    this->m_source_path = std::move(other.m_source_path);
+    if(this != &other)
+    {
+        m_renderer_ptr = std::move(other.m_renderer_ptr);
+        m_source_path = std::move(other.m_source_path);
+        m_font_size = std::move(other.m_font_size);
+        m_max_glyph_w = std::move(other.m_max_glyph_w);
+        m_line_spacing = std::move(other.m_line_spacing);
+        m_font_texture = std::move(other.m_font_texture);
+    }
 
     return *this;
 }
@@ -271,7 +283,7 @@ void Font::CalculateTextTextureSize(const std::string& text, int* w, int* h, int
         text_unicode.push_back(static_cast<Uint16>(code));
 
     TTF_SizeUNICODE(m_font_ptr.get(), text_unicode.data(), &text_w, &text_h);
-    
+
     if(line_length > 0 && line_length > m_max_glyph_w)//allow line break if we have space for, at least, one glyph per line
     {
         *w = line_length;

@@ -34,6 +34,8 @@ class Texture
         void ClearDestinationRect();
         SDL_Colour ColourModulation() const { return m_colour_modulation; };
         void ColourModulation(const SDL_Colour& colour);
+        int AlphaModulation() const { return m_colour_modulation.a; };
+        void AlphaModulation(int alpha){ m_colour_modulation.a = alpha;};
         /* < /Getters/Setters > */
 
         void Render();

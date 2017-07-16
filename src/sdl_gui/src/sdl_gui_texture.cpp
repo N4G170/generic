@@ -12,7 +12,7 @@ Texture::Texture():m_renderer_ptr{nullptr}, m_texture_ptr{nullptr}, m_src_rect{n
 
 }
 
-Texture::Texture(SDL_Renderer* renderer_ptr, SDL_Texture* texture_ptr):m_renderer_ptr{renderer_ptr}, m_texture_ptr{texture_ptr}, m_src_rect{nullptr},
+Texture::Texture(SDL_Renderer* renderer_ptr, SDL_Texture* texture_ptr): m_renderer_ptr{renderer_ptr}, m_texture_ptr{texture_ptr}, m_src_rect{nullptr},
     m_dst_rect{nullptr}, m_colour_modulation{255,255,255,255}
 {
 

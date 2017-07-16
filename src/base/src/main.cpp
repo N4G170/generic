@@ -64,8 +64,9 @@ bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<S
         else
         {
             window.reset(window_ptr);
+            window_ptr = nullptr;
             //Create renderer for window
-            SDL_Renderer* screen_renderer_ptr = SDL_CreateRenderer( window_ptr, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE );
+            SDL_Renderer* screen_renderer_ptr = SDL_CreateRenderer( window.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE );
 
             if( screen_renderer_ptr == nullptr )
             {
@@ -76,6 +77,7 @@ bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<S
             else
             {
                 renderer.reset(screen_renderer_ptr);
+                screen_renderer_ptr = nullptr;
 
                 //Initialize renderer color
                 //SDL_SetRenderDrawColor( renderer.get(), 0xFF, 0xFF, 0xFF, 0xFF );

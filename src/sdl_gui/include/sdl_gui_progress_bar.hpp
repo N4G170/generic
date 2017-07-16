@@ -1,5 +1,4 @@
 #include "sdl_gui_element.hpp"
-#include "sdl_gui_render.hpp"
 #include "sdl_gui_texture.hpp"
 #include "sdl_gui_enums.hpp"
 
@@ -9,12 +8,12 @@ namespace sdl_gui
 #ifndef SDL_GUI_PROGRESS_BAR_HPP
 #define SDL_GUI_PROGRESS_BAR_HPP
 
-class ProgressBar : public GuiElement, public IGuiRender
+class ProgressBar : public GuiElement
 {
     public:
         //<f> Constructors & operator=
         /* Default constructor */
-        ProgressBar(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions);
+        ProgressBar(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
         virtual ~ProgressBar() noexcept;
 
@@ -29,8 +28,14 @@ class ProgressBar : public GuiElement, public IGuiRender
         ProgressBar& operator= (ProgressBar&& other) noexcept;
         //</f>
 
-        //<f> Overrides IGuiRender
+        //<f> Overrides GuiElement
+        // virtual void Input(const SDL_Event& event);
+
+        // virtual void FixedLogic(float fixed_delta_time);
+        // virtual void Logic(float delta_time);
+
         virtual void Render(float delta_time);
+        virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f> Virtual Methods
@@ -67,10 +72,10 @@ class ProgressBar : public GuiElement, public IGuiRender
         float m_max_value;
         float m_value;
 
-        void RenderLeft();
-        void RenderRight();
-        void RenderUp();
-        void RenderDown();
+        void RenderLeft(SDL_Rect& dst);
+        void RenderRight(SDL_Rect& dst);
+        void RenderUp(SDL_Rect& dst);
+        void RenderDown(SDL_Rect& dst);
 };
 
 #endif //SDL_GUI_PROGRESS_BAR_HPP

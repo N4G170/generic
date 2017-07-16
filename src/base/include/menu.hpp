@@ -4,8 +4,7 @@
 #include <vector>
 #include <memory>
 #include "state_interface.hpp"
-#include "sdl_gui_button.hpp"
-#include "sdl_gui_container_box.hpp"
+#include "sdl_gui_manager.hpp"
 
 class Menu : public StateInterface
 {
@@ -28,8 +27,11 @@ class Menu : public StateInterface
          */
         virtual void Render(SDL_Renderer*, float delta_time);
 
+        virtual void Enter();
+        virtual void Exit();
+
     private:
-        sdl_gui::ContainerBox m_container_box;
+        sdl_gui::GuiManager m_gui_manager;
 
         void ChangeStateCallback(const std::string& state);
 };

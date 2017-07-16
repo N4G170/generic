@@ -11,7 +11,7 @@ class CheckBox: public BaseButton
 {
     public:
         /* Default constructor */
-        CheckBox(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions, int value);
+        CheckBox(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
         virtual ~CheckBox() noexcept;
 
@@ -25,26 +25,28 @@ class CheckBox: public BaseButton
         /* Move operator */
         CheckBox& operator= (CheckBox&& other) noexcept;
 
-        //<f> Overrides IGuiInteraction
-        virtual void Input(const SDL_Event& event);
-        //</f>
+        //<f> Overrides GuiElement
+        // virtual void Input(const SDL_Event& event);
 
-        //<f> Overrides GUIElement
-        // virtual void Logic(float fixed_delta_time);
-        //</f>
+        // virtual void FixedLogic(float fixed_delta_time);
+        // virtual void Logic(float delta_time);
 
-        //<f> Overrides IGuiInteraction
         virtual void Render(float delta_time);
+        virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f> Getters/Setters
         bool IsChecked() const { return m_is_checked; }
         void IsChecked(bool is_checked) { m_is_checked = is_checked; }
+
         int Value() const { return m_value; }
         void Value(int new_value) { m_value = new_value; }
         //</f>
 
         //<f> Callbacks
+        /**
+         * \brief Called when the value of this box is changed by user input
+         */
         std::function<void(CheckBox*)> ValueChanged;
 
         void MouseClick();

@@ -30,7 +30,7 @@ class LocalTexture
          * Will create a copy of the pointer
          */
         LocalTexture(SDL_Renderer* renderer_ptr, const Texture& texture);
-        
+
         /* Default destructor */
         virtual ~LocalTexture() noexcept;
 

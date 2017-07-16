@@ -1,6 +1,4 @@
 #include "sdl_gui_element.hpp"
-#include "sdl_gui_interaction.hpp"
-#include "sdl_gui_render.hpp"
 #include "sdl_gui_enums.hpp"
 #include "sdl_gui_base_button.hpp"
 #include "sdl_gui_progress_bar.hpp"
@@ -11,12 +9,12 @@ namespace sdl_gui
 #ifndef SDL_GUI_SLIDER_HPP
 #define SDL_GUI_SLIDER_HPP
 
-class Slider : public ProgressBar, public IGuiInteraction
+class Slider : public ProgressBar
 {
     public:
         //<f> Constructors & operator=
         /* Default constructor */
-        Slider(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions);
+        Slider(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
         virtual ~Slider() noexcept;
 
@@ -31,16 +29,14 @@ class Slider : public ProgressBar, public IGuiInteraction
         Slider& operator= (Slider&& other) noexcept;
         //</f>
 
-        //<f> Overrides IGuiInteraction
+        //<f> Overrides GuiElement
         virtual void Input(const SDL_Event& event);
-        //</f>
 
-        //<f> Overrides GUIElement
+        // virtual void FixedLogic(float fixed_delta_time);
         virtual void Logic(float delta_time);
-        //</f>
 
-        //<f> Overrides IGuiRender
         virtual void Render(float delta_time);
+        virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f> Virtual Methods

@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.8.2)
 #project name and cpp standard (c++11)
 project("CMake Test" CXX)
 set(CMAKE_CXX_STANDARD 11)
+add_compile_options(-g)
 set(app_name "genericSDL")
 
 #include_directories(src)#will search inside all directories inside src

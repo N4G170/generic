@@ -17,8 +17,8 @@ StateMachine::StateMachine(SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager*
 
 StateMachine::~StateMachine()
 {
-    m_previous_state.reset(nullptr);
-    m_current_state.reset(nullptr);
+    // m_previous_state.reset(nullptr);
+    // m_current_state.reset(nullptr);
 
     m_renderer_ptr = nullptr;
     m_resource_manager_ptr = nullptr;
@@ -36,11 +36,15 @@ void StateMachine::ChangeState(const std::string& state)
 
     if(m_previous_state && m_previous_state->Name() == state)//revert to previous state
     {
+        m_current_state->Exit();//exit current
         m_current_state.swap(m_previous_state);
+        m_current_state->Enter();//enter new
+
         return;
     }
-    else //if(m_current_state && !m_previous_state)//store previous state
+    else if(m_current_state)//if(m_current_state && !m_previous_state)//store previous state
     {
+        m_current_state->Exit();
         m_previous_state.reset(m_current_state.release());
     }
 
@@ -69,6 +73,7 @@ void StateMachine::ChangeState(const std::string& state)
     {
         m_current_state.reset(new InfluenceWars(this, StateName::Influence_Wars, m_renderer_ptr, m_resource_manager_ptr));
     }
+    m_current_state->Enter();//enter new state (selected in if else block)
 }
 
 /**

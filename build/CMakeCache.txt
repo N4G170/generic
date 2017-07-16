@@ -152,9 +152,6 @@ CMake Test_BINARY_DIR:STATIC=/home/n4g170/xue/CPP/GenericSDL/build
 //Value Computed by CMake
 CMake Test_SOURCE_DIR:STATIC=/home/n4g170/xue/CPP/GenericSDL
 
-//The directory containing a CMake configuration file for SDL2.
-SDL2_DIR:PATH=/usr/lib64/cmake/SDL2
-
 //Path to a file.
 SDL2_IMAGE_INCLUDE_DIR:PATH=/usr/include/SDL2
 
@@ -178,9 +175,6 @@ SDL2_TTF_INCLUDE_DIR:PATH=/usr/include/SDL2
 
 //Path to a library.
 SDL2_TTF_LIBRARY:FILEPATH=/usr/lib/libSDL2_ttf.so
-
-//The directory containing a CMake configuration file for SDL2_image.
-SDL2_image_DIR:PATH=SDL2_image_DIR-NOTFOUND
 
 //Path to a library.
 SDLMAIN2_LIBRARY:FILEPATH=SDLMAIN2_LIBRARY-NOTFOUND
@@ -337,5 +331,5 @@ SDL2_MIXER_LIBRARY-ADVANCED:INTERNAL=1
 SDL2_TTF_INCLUDE_DIR-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: SDL2_TTF_LIBRARY
 SDL2_TTF_LIBRARY-ADVANCED:INTERNAL=1
-SDL_LIBRARY_TEMP:INTERNAL=/usr/lib/libSDL2.so;-lpthread
+SDL_LIBRARY_TEMP:INTERNAL=/usr/lib/libSDL2.so;-lpthread;-lpthread;-lpthread;-lpthread;-lpthread;-lpthread
 

@@ -14,9 +14,9 @@ namespace sdl_gui
 class Button : public BaseButton
 {
     public:
-
+        //<f> Constructor & operator=
         /* Default constructor */
-        Button(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions);
+        Button(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
         virtual ~Button() noexcept;
 
@@ -29,17 +29,16 @@ class Button : public BaseButton
         Button& operator= (const Button& other);
         /* Move operator */
         Button& operator= (Button&& other) noexcept;
-
-        //<f> Overrides IGuiInteraction
-        virtual void Input(const SDL_Event& event);
         //</f>
 
-        //<f> Overrides GUIElement
-        virtual void Logic(float fixed_delta_time);
-        //</f>
+        //<f> Overrides GuiElement
+        // virtual void Input(const SDL_Event& event);
 
-        //<f> Overrides IGuiRender
+        // virtual void FixedLogic(float fixed_delta_time);
+        // virtual void Logic(float delta_time);
+
         virtual void Render(float delta_time);
+        virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f>  Virtual Methods

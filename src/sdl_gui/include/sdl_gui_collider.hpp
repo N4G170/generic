@@ -71,28 +71,13 @@ class Collider
         Collider& operator= (Collider&& other) noexcept;
 
         bool IsPointColliding(int mouse_x, int mouse_y);
-        // std::function<bool(int,int)> IsPointColliding;
 
         void SetColliderShape(const Position& position, const Dimensions& dimensions);
         void SetColliderShape(const Position& centre_position, int circle_radius);
 
-        void ProcessFlags();
-        std::function<void()> MouseEnterCallBack;
-        std::function<void()> MouseInCallBack;
-        std::function<void()> MouseExitCallBack;
-
-        // void Render(SDL_Renderer* renderer)
-        // {
-        //     SDL_Rect r{m_shapes[0].m_local_position.x, m_shapes[0].m_local_position.y, m_shapes[0].m_dimensions.w, m_shapes[0].m_dimensions.h};
-        //     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); SDL_RenderDrawRect(renderer, &r);
-        // }
-
     private:
         // vars and stuff
         std::vector<ColliderShape> m_shapes;
-
-        bool m_previous_mouse_in;
-        bool m_mouse_in;
         GuiTransform* m_owner_transform;
 };
 

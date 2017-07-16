@@ -6,28 +6,27 @@
 namespace sdl_gui
 {
 
-
 //<f> Constructors & operator=
-Slider::Slider(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions):
-    ProgressBar{renderer_ptr, resource_manager_ptr, position, dimensions}
+Slider::Slider(GuiMainPointers main_pointers, const Position& position, const Dimensions& size):
+    ProgressBar{main_pointers, position, size}
 {
-    m_increase_button.reset(new BaseButton{renderer_ptr, resource_manager_ptr, position, {25,dimensions.h}});
-    m_increase_button->TransformPtr()->Parent(&m_transform);
-    m_increase_button->TransformPtr()->LocalPosition({dimensions.w, 0});
+    m_increase_button.reset(new BaseButton{main_pointers, position, {25,size.h}});
+    m_increase_button->Parent(this);
+    m_increase_button->TransformPtr()->LocalPosition({size.w, 0});
 
-    m_decrease_button.reset(new BaseButton{renderer_ptr, resource_manager_ptr, position, {25,dimensions.h}});
-    m_decrease_button->TransformPtr()->Parent(&m_transform);
+    m_decrease_button.reset(new BaseButton{main_pointers, position, {25,size.h}});
+    m_decrease_button->Parent(this);
     m_decrease_button->TransformPtr()->LocalPosition({-25, 0});
 
-    m_head_button.reset(new BaseButton{renderer_ptr, resource_manager_ptr, position, {20,dimensions.h}});
-    m_head_button->TransformPtr()->Parent(&m_transform);
-    m_head_button->TransformPtr()->LocalPosition({dimensions.w/2-10,0});
+    m_head_button.reset(new BaseButton{main_pointers, position, {20,size.h}});
+    m_head_button->Parent(this);
+    m_head_button->TransformPtr()->LocalPosition({size.w/2-10,0});
 
     m_value_change_factor = 1;
 
-    m_decrease_button->MouseCallback(sdl_gui::MouseCallbackType::CLICK, std::bind(&Slider::DecreaseValue, this));
+    // m_decrease_button->MouseCallback(sdl_gui::MouseCallbackType::CLICK, std::bind(&Slider::DecreaseValue, this));
     // m_decrease_button->MouseCallback(sdl_gui::MouseCallbackType::HOLD, std::bind(&Slider::DecreaseValue, this));
-    m_increase_button->MouseCallback(sdl_gui::MouseCallbackType::CLICK, std::bind(&Slider::IncreaseValue, this));
+    // m_increase_button->MouseCallback(sdl_gui::MouseCallbackType::CLICK, std::bind(&Slider::IncreaseValue, this));
     // m_increase_button->MouseCallback(sdl_gui::MouseCallbackType::HOLD, std::bind(&Slider::IncreaseValue, this));
 }
 
@@ -63,7 +62,7 @@ Slider& Slider::operator=(Slider&& other) noexcept
 }
 //</f>
 
-//<f> Overrides GuiInteraction
+//<f> Overrides GUIElement
 void Slider::Input(const SDL_Event& event)
 {
     if( !m_active )
@@ -72,14 +71,12 @@ void Slider::Input(const SDL_Event& event)
     m_decrease_button->Input(event);
     m_increase_button->Input(event);
 }
-//</f>
 
-//<f> Overrides GUIElement
 void Slider::Logic(float delta_time)
 {
     Position head_position {m_head_button->TransformPtr()->LocalPosition()};
 
-    head_position.x = std::fmin(m_transform.Size().w * m_value/m_max_value, m_transform.Size().w);
+    head_position.x = std::fmin(Size().w * m_value/m_max_value, Size().w);
 
     m_head_button->TransformPtr()->LocalPosition(head_position);
 
@@ -87,20 +84,37 @@ void Slider::Logic(float delta_time)
     m_increase_button->Logic(delta_time);
 }
 
-//</f>
-
-//<f> Overrides IGuiRender
 void Slider::Render(float delta_time)
 {
+    Render(delta_time, m_main_pointers.main_camera_ptr);
+}
 
-    ProgressBar::Render(delta_time);
+void Slider::Render(float delta_time, Camera* camera)
+{
+    if(!m_render)
+    return;
 
-    m_increase_button->Render(delta_time);
-    m_decrease_button->Render(delta_time);
-    m_head_button->Render(delta_time);
+    //Cannot call -> "ProgressBar::Render(delta_time);"
+    //As it starts an infinite loop of calls because ProgressBar::Render(delta_time) will call (the child)Slider::Render(float delta_time, Camera* camera)
+    //and it will call ProgressBar::Render(delta_time) again. You get the point
+    ProgressBar::Render(delta_time, camera);
 
-    if(m_render_border)
-        RenderBorder(delta_time);
+    SDL_Rect dst{RenderRect()};
+
+    //apply camera position
+    if(!m_transform.ParentViewport())//if inside viewport we cant add camera position
+    {
+        dst.x += camera->CameraPosition().x;
+        dst.y += camera->CameraPosition().y;
+    }
+
+    if(camera->RectInsideCamera(dst))
+    {
+        m_increase_button->Render(delta_time);
+        m_decrease_button->Render(delta_time);
+        m_head_button->Render(delta_time);
+    }
+
 }
 //</f>
 

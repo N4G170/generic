@@ -50,6 +50,7 @@ namespace StateName
     const std::string Solar_System {"solar_system"};
     const std::string Map_Demo {"map_demo"};
     const std::string Influence_Wars {"influence_wars"};
+    const std::string Particles {"particles"};
 }
 
 //Rain

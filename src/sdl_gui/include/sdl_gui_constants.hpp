@@ -17,7 +17,7 @@ const int c_horizontal_tab_code{int('\t')};
 const std::string c_img_white_dot{"data/img/white_dot.png"};
 const std::string c_button_base{"data/img/button_base.png"};
 
-const std::string c_default_font{"data/font/DejaVuSansMono.ttf"};
+const std::string c_default_font_path{"data/font/DejaVuSansMono.ttf"};
 
 //</f>
 

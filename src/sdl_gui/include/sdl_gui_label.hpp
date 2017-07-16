@@ -1,7 +1,6 @@
 #include <string>
 #include "SDL2/SDL.h"
 #include "sdl_gui_element.hpp"
-#include "sdl_gui_render.hpp"
 #include "sdl_gui_local_texture.hpp"
 #include "sdl_gui_font.hpp"
 
@@ -11,14 +10,14 @@ namespace sdl_gui
 #ifndef SDL_GUI_LABEL_HPP
 #define SDL_GUI_LABEL_HPP
 
-class Label : public GuiElement, public IGuiRender
+class Label : public GuiElement
 {
     public:
+        //<f> Constructors & operator=
         /* Default constructor */
         // Label();
-
-        Label(SDL_Renderer* renderer, ResourceManager* resource_manager_ptr, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position);
-        Label(SDL_Renderer* renderer, ResourceManager* resource_manager_ptr, Font* font_ptr, const std::string& text, const SDL_Colour& text_colour, Position position);
+        Label(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
+        // Label(GuiMainPointers main_pointers, Font* font_ptr, const std::string& text, const SDL_Colour& text_colour, Position position);
 
         /* Default destructor */
         virtual ~Label() noexcept;
@@ -32,18 +31,26 @@ class Label : public GuiElement, public IGuiRender
         Label& operator= (const Label& other);
         /* Move operator */
         Label& operator= (Label&& other) noexcept;
-
-        //<f> Overrides GuiElement
-        virtual void Logic(float delta_time);
         //</f>
 
-        //<f> Overrides IGuiRender
+        //<f> Config
+        void ConfigLabel(const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour);
+        void ConfigLabel(Font* font, const std::string& text, const SDL_Colour& text_colour);
+        //</f>
+
+        //<f> Overrides GuiElement
+        // virtual void Input(const SDL_Event& event);
+
+        // virtual void FixedLogic(float fixed_delta_time);
+        // virtual void Logic(float delta_time);
+
         virtual void Render(float delta_time);
+        virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f> Getters/Setters
         std::string Text();
-        virtual void Text(const std::string& text, const SDL_Colour& text_colour);
+        void Text(const std::string& text, const SDL_Colour& text_colour = {0,0,0,255});
 
         int LineLength() const { return m_line_length; }
         void LineLength(int line_length);

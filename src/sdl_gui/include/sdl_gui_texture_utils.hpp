@@ -5,10 +5,16 @@
 namespace sdl_gui
 {
 
+/**
+ * \brief Creates a new SDL_Texture with the given params.
+ * \n The user is responsible for managing it.
+ */
 SDL_Texture* CreateSDLTexture(SDL_Renderer* renderer_ptr, int w, int h, Uint32 pixel_format = SDL_PIXELFORMAT_RGBA8888, int access_type = SDL_TEXTUREACCESS_TARGET);
 
 /**
- * \brief Clears the content of a texture to the given colour. NOTE: function is ALPHA AWARE. Default colour {255,255,255,0}
+ * \brief Clears the content of a texture to the given colour.
+ * \n SDL_Texture access type must be "SDL_TEXTUREACCESS_TARGET"
+ * \n NOTE: function is ALPHA AWARE. Default colour {255,255,255,0}
  */
 void ClearSDLTexture(SDL_Renderer* renderer_ptr, SDL_Texture* texture, const SDL_Colour& colour = {255,255,255,0});
 
@@ -29,12 +35,12 @@ SDL_Texture* ResizeSDLTexture(SDL_Renderer* renderer_ptr, SDL_Texture* original,
 void ResizeSDLTexture(SDL_Renderer* renderer_ptr, std::unique_ptr<SDL_Texture, SDLDeleters>& original, int new_w, int new_h, bool scale_content = false);
 
 /**
- * \brief Duplicates an sdl_texture. New Texture Access will be TARGET
+ * \brief Duplicates an SDL_Texture. New Texture Access will be TARGET
  */
 SDL_Texture* DuplicateSDLTexture(SDL_Renderer* renderer_ptr, SDL_Texture* original);
 
 /**
- * \brief Duplicates an sdl_texture. New Texture Access will be TARGET
+ * \brief Duplicates an SDL_Texture. New Texture Access will be TARGET
  */
 SDL_Texture* DuplicateSDLTexture(SDL_Renderer* renderer_ptr, const std::unique_ptr<SDL_Texture, SDLDeleters>& original);
 

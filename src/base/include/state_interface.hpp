@@ -15,19 +15,41 @@ struct MainFlags;
 class StateInterface
 {
     public:
+        //<f> Constructors & operator=
         StateInterface(StateMachine* state_machine, const std::string& state_name, sdl_gui::ResourceManager* resource_manager_ptr):m_state_machine_ptr{state_machine},
         m_resource_manager_ptr{resource_manager_ptr}, m_state_name{state_name} {};
+
         virtual ~StateInterface(){ m_state_machine_ptr = nullptr; m_resource_manager_ptr = nullptr; };
 
-        // StateInterface(const StateInterface& other):m_state_machine_ptr{other.m_state_machine_ptr},
-        // m_state_name{other.m_state_name} {};
+        StateInterface(const StateInterface& other) : m_state_machine_ptr{other.m_state_machine_ptr}, m_resource_manager_ptr{other.m_resource_manager_ptr},
+            m_state_name{other.m_state_name} {};
 
-        // StateInterface(const StateInterface&& other)
-        // {
-        //     m_state_machine_ptr = std::move(other.m_state_machine_ptr);
-        //     m_state_name = std::move(other.m_state_name);
-        // };
+        StateInterface(StateInterface&& other) : m_state_machine_ptr{std::move(other.m_state_machine_ptr)}, m_resource_manager_ptr{std::move(other.m_resource_manager_ptr)},
+            m_state_name{std::move(other.m_state_name)} {};
 
+        StateInterface& operator= (const StateInterface& other)
+        {
+            if(this != &other)
+            {
+                m_state_machine_ptr = other.m_state_machine_ptr;
+                m_resource_manager_ptr = other.m_resource_manager_ptr;
+                m_state_name = other.m_state_name;
+            }
+            return *this;
+        }
+        StateInterface& operator= (const StateInterface&& other)
+        {
+            if(this != &other)
+            {
+                m_state_machine_ptr = std::move(other.m_state_machine_ptr);
+                m_resource_manager_ptr = std::move(other.m_resource_manager_ptr);
+                m_state_name = std::move(other.m_state_name);
+            }
+            return *this;
+        }
+        //</f>
+
+        //<f> Interface
         /**
          * \brief Precess SDL user input
          */
@@ -36,7 +58,9 @@ class StateInterface
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float fixed_delta_time = 1) = 0;
+        virtual void Logic(float delta_time = 1) = 0;
+
+        // virtual void FixedLogic(float fixed_delta_time = 1) = 0;
 
         /**
          * \brief Render the state visual elements
@@ -52,8 +76,11 @@ class StateInterface
          * \brief Not yet in use
          */
         virtual void Exit(){};
+        //</f>
 
+        //<f> Getters/Setters
         std::string Name() const { return m_state_name; }
+        //</f>
 
     protected:
         StateMachine* m_state_machine_ptr;

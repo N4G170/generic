@@ -8,8 +8,7 @@
 namespace sdl_gui
 {
 
-Button::Button(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions):
-    BaseButton{renderer_ptr, resource_manager_ptr, position, dimensions}
+Button::Button(GuiMainPointers main_pointers, const Position& position, const Dimensions& size): BaseButton{main_pointers, position, size}
 {
 
 }
@@ -46,27 +45,27 @@ Button& Button::operator=(Button&& other) noexcept
     return *this;
 }
 
-//<f> Overrides IGuiInteraction
-void Button::Input(const SDL_Event &event)
-{
-    BaseButton::Input(event);
-}
-//</f>
-
 //<f> Overrides GUIElement
-void Button::Logic(float fixed_delta_time)
-{
-    BaseButton::Logic(fixed_delta_time);
-}
-//</f>
-
-//<f> Overrides IGuiRender
+// void Button::Input(const SDL_Event &event)
+// {
+//     BaseButton::Input(event);
+// }
+//
+// void Button::Logic(float fixed_delta_time)
+// {
+//     BaseButton::Logic(fixed_delta_time);
+// }
 void Button::Render(float delta_time)
 {
-    if(!m_render)
-    return;
+    Render(delta_time, m_main_pointers.main_camera_ptr);
+}
 
-    BaseButton::Render(delta_time);
+void Button::Render(float delta_time, Camera* camera)
+{
+    if(!m_render)
+        return;
+
+    BaseButton::Render(delta_time, camera);
 
     if(m_label_ptr)
         m_label_ptr->Render(delta_time);
@@ -76,9 +75,10 @@ void Button::Render(float delta_time)
 /* < Virtual Methods > */
 void Button::CreateLabel(const std::string& text, const std::string& font_path, int font_size, const SDL_Colour& text_colour, Position local_position)
 {
-    m_label_ptr.reset(new Label(m_renderer_ptr, m_resource_manager_ptr, font_path, font_size, text, text_colour, local_position));
-    m_label_ptr->TransformPtr()->Parent(this->TransformPtr());
+    m_label_ptr.reset(new Label(m_main_pointers, local_position, Size()));
+    m_label_ptr->Parent(this);
     m_label_ptr->TransformPtr()->LocalPosition(local_position);
+    m_label_ptr->ConfigLabel(font_path, font_size, text, text_colour);
 }
 /* </ Virtual Methods > */
 

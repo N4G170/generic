@@ -1,6 +1,7 @@
 #include "sdl_gui_collider.hpp"
 #include <utility>
 #include "sdl_gui_log.hpp"
+#include "sdl_gui_element.hpp"
 
 namespace sdl_gui
 {
@@ -104,13 +105,13 @@ bool ColliderShape::CirclePointCollision(int mouse_x, int mouse_y)
 // <f> < GUI_COLLIDER >
 /* Box constructor */
 Collider::Collider(const Position& position, const Dimensions& rect_collider, GuiTransform* owner_transform): m_shapes{ColliderShape{position, rect_collider, owner_transform}},
-    m_previous_mouse_in{false}, m_mouse_in{false}, m_owner_transform{owner_transform}
+    m_owner_transform{owner_transform}
 {
 
 }
 /* Circle constructor */
 Collider::Collider(const Position& position, int circle_radius, GuiTransform* owner_transform): m_shapes{ColliderShape{position, circle_radius, owner_transform}},
-    m_previous_mouse_in{false}, m_mouse_in{false}, m_owner_transform{owner_transform}
+    m_owner_transform{owner_transform}
 {
 
 }
@@ -163,27 +164,14 @@ void Collider::SetColliderShape(const Position& centre_position, int circle_radi
     m_shapes.push_back(ColliderShape{centre_position, circle_radius, m_owner_transform});
 }
 
-void Collider::ProcessFlags()
-{
-    if(MouseEnterCallBack && !m_previous_mouse_in && m_previous_mouse_in != m_mouse_in)//enter
-    {
-        MouseEnterCallBack();
-    }
-    else if(MouseInCallBack && m_mouse_in)//in
-    {
-        MouseInCallBack();
-    }
-    else if(MouseExitCallBack && m_previous_mouse_in && m_previous_mouse_in != m_mouse_in)//exit
-    {
-        MouseExitCallBack();
-    }
-
-    m_previous_mouse_in = m_mouse_in;
-}
-
 /* colliders */
 bool Collider::IsPointColliding(int mouse_x, int mouse_y)
 {
+    //ajust mouse position to account for camera movement
+    auto camera_position {m_owner_transform->Owner()->GuiCamera()->CameraPosition()};
+    mouse_x -= camera_position.x;
+    mouse_y -= camera_position.y;
+
     for(const ColliderShape& shape : m_shapes)
     {
         if(shape.IsPointColliding(mouse_x, mouse_y))

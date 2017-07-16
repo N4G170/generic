@@ -2,48 +2,43 @@
 #include "sdl_gui_texture_utils.hpp"
 #include <utility>
 #include <iostream>
+#include "sdl_gui_constants.hpp"
+#include "sdl_gui_log.hpp"
+#include "sdl_gui_utils.hpp"
 
 namespace sdl_gui
 {
-
+//<f> Constructors & operator=
 // Label::Label(): IGuiRender{}, m_text_texture{}, m_text{""}, m_text_colour{0,0,0,255}, m_font_ptr{nullptr}
 // {
 //     m_renderer_ptr = nullptr;
 // }
-
-Label::Label(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour, Position position):
-    GuiElement{position, {0,0}}, IGuiRender{renderer_ptr, resource_manager_ptr}, m_text_texture{m_renderer_ptr,0,0}, m_text{text}, m_text_colour{text_colour}
+Label::Label(GuiMainPointers main_pointers, const Position& position, const Dimensions& size):GuiElement{main_pointers, position, {0,0}},
+    m_text_texture{m_main_pointers.main_renderer_ptr,0,0}, m_text{"label text"}, m_text_colour{0,0,0,255},
+    m_font_ptr{m_main_pointers.resource_manager_ptr->GetFont(c_default_font_path, c_default_font_size)}, m_line_length{0}
 {
-    m_font_ptr = m_resource_manager_ptr->GetFont(font_path, font_size);
-    m_line_length=0;
     //Sets the new text and resizes the texture if needed
     Text(m_text, m_text_colour);
 }
 
-Label::Label(SDL_Renderer* renderer, ResourceManager* resource_manager_ptr, Font* font_ptr, const std::string& text, const SDL_Colour& text_colour, Position position)
-{
-    m_font_ptr = nullptr;
-}
+// Label::Label(GuiMainPointers main_pointers, Font* font_ptr, const std::string& text, const SDL_Colour& text_colour, Position position):
+//     GuiElement{main_pointers, position, {0,0}}
+// {
+//     m_font_ptr = nullptr;
+// }
 
 Label::~Label() noexcept
 {
 
 }
 
-Label::Label(const Label& other):m_text_texture{other.m_text_texture}, m_text{other.m_text}, m_text_colour{other.m_text_colour},
-    m_font_ptr{other.m_font_ptr}
+Label::Label(const Label& other): GuiElement{other}, m_text_texture{other.m_text_texture}, m_text{other.m_text}, m_text_colour{other.m_text_colour},
+    m_font_ptr{other.m_font_ptr}, m_line_length{other.m_line_length}
 {
-    m_renderer_ptr = other.m_renderer_ptr;
 }
 
-Label::Label(Label&& other) noexcept
-{
-    this->m_text_texture = std::move(other.m_text_texture);
-    this->m_text = std::move(other.m_text);
-    this->m_text_colour = std::move(other.m_text_colour);
-    this->m_font_ptr = std::move(other.m_font_ptr);
-    this->m_renderer_ptr = std::move(other.m_renderer_ptr);
-}
+Label::Label(Label&& other) noexcept: GuiElement{other}, m_text_texture{std::move(other.m_text_texture)}, m_text{std::move(other.m_text)},
+    m_text_colour{std::move(other.m_text_colour)}, m_font_ptr{std::move(other.m_font_ptr)}, m_line_length{std::move(other.m_line_length)} {}
 
 Label& Label::operator=(const Label& other)
 {
@@ -58,42 +53,63 @@ Label& Label::operator=(const Label& other)
 
 Label& Label::operator=(Label&& other) noexcept
 {
-    this->m_text_texture = std::move(other.m_text_texture);
-    this->m_text = std::move(other.m_text);
-    this->m_text_colour = std::move(other.m_text_colour);
-    this->m_font_ptr = std::move(other.m_font_ptr);
-    this->m_renderer_ptr = std::move(other.m_renderer_ptr);
-
+    if(this != &other)
+    {
+        GuiElement::operator=(other);
+        this->m_text_texture = std::move(other.m_text_texture);
+        this->m_text = std::move(other.m_text);
+        this->m_text_colour = std::move(other.m_text_colour);
+        this->m_font_ptr = std::move(other.m_font_ptr);
+    }
     return *this;
-}
-
-//<f> Overrides GUIElement
-void Label::Logic(float delta_time)
-{
-
 }
 //</f>
 
-//<f> Overrides IGuiRender
+//<f> Config
+void Label::ConfigLabel(const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour)
+{
+    m_font_ptr = m_main_pointers.resource_manager_ptr->GetFont(font_path, font_size);
+    Text(text, text_colour);
+}
+
+void Label::ConfigLabel(Font* font, const std::string& text, const SDL_Colour& text_colour)
+{
+    m_font_ptr = font;
+    Text(text, text_colour);
+}
+//</f>
+
+//<f> Overrides GuiElement
 void Label::Render(float delta_time)
 {
-    SDL_Rect src{ m_transform.RenderRect() };
-    SDL_Rect dst{ m_transform.RenderRect() };
+    Render(delta_time, m_main_pointers.main_camera_ptr);
+}
 
+void Label::Render(float delta_time, Camera* camera)
+{
+    if(!m_render)
+        return;
+
+    SDL_Rect dst{RenderRect()};
+    SDL_Rect src{dst};
     src.x = src.y = 0;
 
     if(m_line_length > 0)
     {
         src.w = m_line_length;
         dst.w = m_line_length;
-        // m_border_rect.w = m_line_length;
     }
 
-    m_text_texture.Render(&src, &dst);//cut overflow
-    // m_text_texture.Render(nullptr, &dst);
+    //apply camera position
+    if(!m_transform.ParentViewport())//if inside viewport we cant add camera position
+    {
+        dst.x += camera->CameraPosition().x;
+        dst.y += camera->CameraPosition().y;
+    }
 
-    if(m_render_border)
-        RenderBorder(delta_time);
+    if(camera->RectInsideCamera(dst))
+        m_text_texture.Render(&src, &dst);
+
 }
 //</f>
 
@@ -108,12 +124,12 @@ void Label::Text(const std::string& text, const SDL_Colour& text_colour)
     m_text_colour = text_colour;
     int w{0}, h{0};
     m_font_ptr->CalculateTextTextureSize(text, &w, &h, m_line_length);
-    Dimensions size{m_transform.Size()};
+    Dimensions size{Size()};
 
     if(w > size.w || h > size.h)//current texture is too small
     {
-        m_transform.Size({w,h});
-        m_text_texture.TexturePtr(CreateSDLTexture(m_renderer_ptr, w,h));
+        Size({static_cast<float>(w),static_cast<float>(h)});
+        m_text_texture.TexturePtr(CreateSDLTexture(m_main_pointers.main_renderer_ptr, w,h));
     }
     else
     {
@@ -121,8 +137,6 @@ void Label::Text(const std::string& text, const SDL_Colour& text_colour)
     }
 
     m_font_ptr->StringTexture(text, 0, 0, text_colour, m_text_texture.TexturePtr());
-
-    m_border_rect = m_transform.RenderRect();
 }
 
 void Label::LineLength(int line_length)

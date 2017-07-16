@@ -7,17 +7,14 @@ namespace sdl_gui
 {
 
 //<f> Constructors & operator=
-ProgressBar::ProgressBar(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr, Position position, Dimensions dimensions) :
-    GuiElement{position, dimensions}, IGuiRender{renderer_ptr, resource_manager_ptr},
-    m_bg_texture{m_resource_manager_ptr->GetTexture(c_img_white_dot)}, m_bar_texture{m_resource_manager_ptr->GetTexture(c_img_white_dot)}
+ProgressBar::ProgressBar(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) :
+    GuiElement{main_pointers, position, size},
+    m_bg_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)}, m_bar_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)},
+    m_bar_direction{ProgressBarDirection::RIGHT}, m_min_value{0}, m_max_value{100}, m_value{0}
 {
     m_bg_texture.ColourModulation({0,0,0,255});
 
-    m_max_value = 100;
-    m_min_value = 0;
-    m_value = 0;
 
-    m_bar_direction = ProgressBarDirection::RIGHT;
 }
 
 ProgressBar::~ProgressBar() noexcept
@@ -25,12 +22,16 @@ ProgressBar::~ProgressBar() noexcept
 
 }
 
-ProgressBar::ProgressBar(const ProgressBar& other)
+ProgressBar::ProgressBar(const ProgressBar& other) : GuiElement{other},
+    m_bg_texture{other.m_bg_texture}, m_bar_texture{other.m_bar_texture},
+    m_bar_direction{other.m_bar_direction}, m_min_value{other.m_min_value}, m_max_value{other.m_max_value}, m_value{other.m_value}
 {
 
 }
 
-ProgressBar::ProgressBar(ProgressBar&& other) noexcept
+ProgressBar::ProgressBar(ProgressBar&& other) noexcept : GuiElement{other},
+    m_bg_texture{std::move(other.m_bg_texture)}, m_bar_texture{std::move(other.m_bar_texture)},
+    m_bar_direction{std::move(other.m_bar_direction)}, m_min_value{std::move(other.m_min_value)}, m_max_value{std::move(other.m_max_value)}, m_value{std::move(other.m_value)}
 {
 
 }
@@ -48,33 +49,57 @@ ProgressBar& ProgressBar::operator=(const ProgressBar& other)
 
 ProgressBar& ProgressBar::operator=(ProgressBar&& other) noexcept
 {
+    if(this != &other)
+    {
+        GuiElement::operator=(other);
+        m_bg_texture = std::move(other.m_bg_texture);
+        m_bar_texture = std::move(other.m_bar_texture);
+        m_bar_direction = std::move(other.m_bar_direction);
+        m_min_value = std::move(other.m_min_value);
+        m_max_value = std::move(other.m_max_value);
+        m_value = std::move(other.m_value);
+    }
     return *this;
 }
 //</f>
 
-//<f> Overrides IGuiRender
+//<f> Overrides GuiElement
 void ProgressBar::Render(float delta_time)
 {
-    SDL_Rect dst{m_transform.RenderRect()};
+    Render(delta_time, m_main_pointers.main_camera_ptr);
+}
 
-    m_bg_texture.Render(nullptr, &dst);
+void ProgressBar::Render(float delta_time, Camera* camera)
+{
+    if(!m_render)
+        return;
 
-    switch(m_bar_direction)
+    SDL_Rect dst{RenderRect()};
+
+    //apply camera position
+    if(!m_transform.ParentViewport())//if inside viewport we cant add camera position
     {
-        case ProgressBarDirection::LEFT: RenderLeft(); break;
-        case ProgressBarDirection::RIGHT: RenderRight(); break;
-        case ProgressBarDirection::UP: RenderUp(); break;
-        case ProgressBarDirection::DOWN: RenderDown(); break;
+        dst.x += camera->CameraPosition().x;
+        dst.y += camera->CameraPosition().y;
     }
 
-    if(m_render_border)
-        RenderBorder(delta_time);
+    if(camera->RectInsideCamera(dst))
+    {
+        m_bg_texture.Render(nullptr, &dst);
+
+        switch(m_bar_direction)
+        {
+            case ProgressBarDirection::LEFT: RenderLeft(dst); break;
+            case ProgressBarDirection::RIGHT: RenderRight(dst); break;
+            case ProgressBarDirection::UP: RenderUp(dst); break;
+            case ProgressBarDirection::DOWN: RenderDown(dst); break;
+        }
+    }
 }
 //</f>
 
-void ProgressBar::RenderLeft()
+void ProgressBar::RenderLeft(SDL_Rect& dst)
 {
-    SDL_Rect dst{m_transform.RenderRect()};
     int ten_percent{dst.w/10 > dst.h/10 ? dst.h/10 : dst.w/10};
 
     int prev_w = dst.w;
@@ -87,9 +112,8 @@ void ProgressBar::RenderLeft()
     m_bar_texture.Render(nullptr, &dst);
 }
 
-void ProgressBar::RenderRight()
+void ProgressBar::RenderRight(SDL_Rect& dst)
 {
-    SDL_Rect dst{m_transform.RenderRect()};
     int ten_percent{dst.w/10 > dst.h/10 ? dst.h/10 : dst.w/10};
 
     dst.x += ten_percent;
@@ -101,9 +125,8 @@ void ProgressBar::RenderRight()
     m_bar_texture.Render(nullptr, &dst);
 }
 
-void ProgressBar::RenderUp()
+void ProgressBar::RenderUp(SDL_Rect& dst)
 {
-    SDL_Rect dst{m_transform.RenderRect()};
     int ten_percent{dst.w/10 > dst.h/10 ? dst.h/10 : dst.w/10};
 
     dst.x += ten_percent;
@@ -116,9 +139,8 @@ void ProgressBar::RenderUp()
     m_bar_texture.Render(nullptr, &dst);
 }
 
-void ProgressBar::RenderDown()
+void ProgressBar::RenderDown(SDL_Rect& dst)
 {
-    SDL_Rect dst{m_transform.RenderRect()};
     int ten_percent{dst.w/10 > dst.h/10 ? dst.h/10 : dst.w/10};
 
     dst.x += ten_percent;
