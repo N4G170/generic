@@ -2,6 +2,7 @@
 #include "sdl_gui_log.hpp"
 #include "sdl_gui_utils.hpp"
 #include <utility>
+#include <algorithm>
 
 namespace sdl_gui
 {
@@ -18,12 +19,12 @@ Layout::~Layout() noexcept
 
 }
 
-Layout::Layout(const Layout& other): GuiElement{other}, m_layout_config{other.m_layout_config}
+Layout::Layout(const Layout& other): GuiElement{other}, m_elements{other.m_elements}, m_layout_config{other.m_layout_config}
 {
 
 }
 
-Layout::Layout(Layout&& other) noexcept:  GuiElement{other}, m_layout_config{std::move(other.m_layout_config)}
+Layout::Layout(Layout&& other) noexcept:  GuiElement{std::move(other)}, m_elements{std::move(other.m_elements)}, m_layout_config{std::move(other.m_layout_config)}
 {
 
 }
@@ -44,6 +45,7 @@ Layout& Layout::operator=(Layout&& other) noexcept
     if(this != &other)
     {
         GuiElement::operator=(other);
+        m_elements= std::move(other.m_elements);
         m_layout_config = std::move(other.m_layout_config);
     }
     return *this;
@@ -85,15 +87,17 @@ void Layout::AddElement(GuiElement* element)
     if(m_layout_config.wrap_mode == LayoutWrapMode::LAYOUT_HIDDEN)
         element->TransformPtr()->ParentViewport(this->TransformPtr());
 
-    m_elements[element->ElementUID()] = element;
+    m_elements.push_back(element);
 
     //update internal positioning
     UpdateElementsPositions();
 }
 
-void Layout::RemoveElement(UID uid)
+void Layout::RemoveElement(GuiElement* element)
 {
-    m_elements.erase(uid);
+    auto search_result{std::find_if(std::begin(m_elements), std::end(m_elements), [element](GuiElement* vec_element)->bool{ return *element == *vec_element; } )};
+    if(search_result != std::end(m_elements))
+        m_elements.erase(search_result);
 }
 //</f>
 
@@ -106,14 +110,14 @@ void Layout::UpdateElementsPositions()
     auto column{0};
     for(auto& element : m_elements)
     {
-        Position tmp_position{element.second->LocalPosition()};
+        Position tmp_position{element->LocalPosition()};
 
         tmp_position.x = m_layout_config.left_margin + m_layout_config.horizontal_element_spacing * column + (column==0 ? 0 : m_layout_config.element_size.w) * column;
         //sum margin with spacing and the height of previous element
         tmp_position.y = m_layout_config.top_margin + m_layout_config.vertical_element_spacing * line + (line==0 ? 0 : m_layout_config.element_size.h) * line;
 
-        element.second->LocalPosition(tmp_position);
-        
+        element->LocalPosition(tmp_position);
+
         //Manage line/column index
         ++column;
         if(column >= total_columns)//reset

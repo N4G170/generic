@@ -3,6 +3,7 @@
 #include <utility>
 #include <array>
 #include <iostream>
+#include <algorithm>
 #include "sdl_gui_utf8.hpp"
 #include "sdl_gui_constants.hpp"
 
@@ -58,30 +59,33 @@ Font& Font::operator=(Font&& other) noexcept
 
 bool Font::StringTexture(const std::string& text, int origin_x, int origin_y, SDL_Colour font_colour, SDL_Texture* output_texture, int line_length)
 {
+    //Clear to transparency
     ClearSDLTexture(m_renderer_ptr, output_texture);
 
     //print text
     int x{0};
     int y{0};
-    bool bold{false};
-    bool italic{false};
+    bool bold{false};//use bold font
+    bool italic{false};//use italic font
 
+    //apply any color and alpha modulation to the font
     SDL_SetTextureColorMod(m_font_texture, font_colour.r, font_colour.g, font_colour.b);
+    SDL_SetTextureAlphaMod(m_font_texture, font_colour.a);
 
-    std::vector<int> text_codes{ DecodeStringUTF8(text) };
+    std::vector<int> text_codes{ DecodeStringUTF8(text) };//decode to int
     int prev_h{0};//used to perform new line with \n
     int prev_w{0};//used to perform tab with \t
 
     SDL_SetRenderTarget(m_renderer_ptr, output_texture);
     for(int i{0}; i < text_codes.size(); ++i)
     {
-        if(text_codes[i] == c_new_line_code)//new line
+        if(text_codes[i] == c_new_line_code)//new line \n
         {
             x = 0;
             y += prev_h + m_line_spacing;
             continue;
         }
-        else if(text_codes[i] == c_horizontal_tab_code)
+        else if(text_codes[i] == c_horizontal_tab_code)// \t
         {
             x += prev_w * 4;//four time the space
 
@@ -148,7 +152,7 @@ bool Font::StringTexture(const std::string& text, int origin_x, int origin_y, SD
                     ++char_index;
                 }
 
-                if(x + word_length > line_length)
+                if(x + word_length > line_length)//new line
                 {
                     x = 0;
                     y = y + dst.h + m_line_spacing;
@@ -166,7 +170,8 @@ bool Font::StringTexture(const std::string& text, int origin_x, int origin_y, SD
     }
     SDL_SetRenderTarget(m_renderer_ptr, nullptr);
 
-    SDL_SetTextureColorMod(m_font_texture, 255, 255, 255);
+    SDL_SetTextureColorMod(m_font_texture, 255, 255, 255);//reset modulation to white
+    SDL_SetTextureAlphaMod(m_font_texture, 255);//opaque
     return true;
 }
 
@@ -278,8 +283,37 @@ void Font::CalculateTextTextureSize(const std::string& text, int* w, int* h, int
     int text_w{0}, text_h{0};
 
     std::vector<int> text_codes{ DecodeStringUTF8(text) };
+
+    //remove any text tag as they should not count towards text length
+    for(auto i{0}; i < text_codes.size(); ++i)
+    {
+        if(CheckTextTag(true, text_codes, i, i+2, 1))//check if open tag
+        {
+            text_codes[i] = text_codes[i+1] = text_codes[i+2] = -1;//invalidate entry
+            i+=3;
+        }
+        else if(CheckTextTag(false, text_codes, i, i+3, 1))//close
+        {
+            text_codes[i] = text_codes[i+1] = text_codes[i+2] = text_codes[i+3] = -1;//invalidate entry
+            i+=4;
+        }
+        else if(CheckTextTag(true, text_codes, i, i+2, 2))//check if open tag italic
+        {
+            text_codes[i] = text_codes[i+1] = text_codes[i+2] = -1;//invalidate entry
+            i+=3;
+        }
+        else if(CheckTextTag(false, text_codes, i, i+3, 2))//close
+        {
+            text_codes[i] = text_codes[i+1] = text_codes[i+2] = text_codes[i+3] = -1;//invalidate entry
+            i+=4;
+        }
+    }
+
+    //remove invalid codes, -1 from previous loop
+    text_codes.erase(std::remove_if( std::begin(text_codes), std::end(text_codes), [](int code)->bool{ return code == -1;}), std::end(text_codes));
+
     std::vector<Uint16> text_unicode;
-    for(int code : text_codes)//convert int to Uint16
+    for(int code : text_codes)//convert int to Uint16 so we can use TTF_SizeUNICODE
         text_unicode.push_back(static_cast<Uint16>(code));
 
     TTF_SizeUNICODE(m_font_ptr.get(), text_unicode.data(), &text_w, &text_h);

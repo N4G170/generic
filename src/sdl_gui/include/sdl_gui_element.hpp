@@ -62,6 +62,12 @@ class GuiElement
         UID ElementUID() const { return m_uid; }
         GuiTransform* TransformPtr() { return &m_transform; }
         Camera* GuiCamera() const { return m_main_pointers.main_camera_ptr; }
+
+        bool CanRender() const { return m_render; }
+        void CanRender(bool render){ m_render = render; }
+
+        bool IsActive() const { return m_active; }
+        void IsActive(bool is_active){ m_active = is_active; }
         //</f>
 
         //<f> Position, Size & Transform interface

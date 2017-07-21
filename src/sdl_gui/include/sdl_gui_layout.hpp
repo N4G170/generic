@@ -61,7 +61,7 @@ class Layout: public GuiElement
          */
         void AddElement(GuiElement* element);
 
-        void RemoveElement(UID uid);
+        void RemoveElement(GuiElement* element);
 
         LayoutConfig Config() const { return m_layout_config; }
         void Config(const LayoutConfig& config){ m_layout_config = config; }
@@ -69,7 +69,7 @@ class Layout: public GuiElement
 
     private:
         //<f> Elements
-        std::unordered_map<UID, GuiElement*> m_elements;
+        std::vector<GuiElement*> m_elements;
 
         LayoutConfig m_layout_config;
 

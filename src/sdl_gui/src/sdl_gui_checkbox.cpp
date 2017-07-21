@@ -88,7 +88,7 @@ void CheckBox::Render(float delta_time, Camera* camera)
 
     if(camera->RectInsideCamera(dst))
     {
-        m_box_texture.Render(m_current_source_rect, &dst);
+        m_current_transition->Render(dst);
 
         //calculate checkmark coordinates and dimensions//TMP
         int check_w{dst.w/3};

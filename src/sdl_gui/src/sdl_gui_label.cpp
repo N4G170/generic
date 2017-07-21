@@ -69,12 +69,16 @@ Label& Label::operator=(Label&& other) noexcept
 void Label::ConfigLabel(const std::string& font_path, int font_size, const std::string& text, const SDL_Colour& text_colour)
 {
     m_font_ptr = m_main_pointers.resource_manager_ptr->GetFont(font_path, font_size);
+    m_text = text;
+    m_text_colour = text_colour;
     Text(text, text_colour);
 }
 
 void Label::ConfigLabel(Font* font, const std::string& text, const SDL_Colour& text_colour)
 {
     m_font_ptr = font;
+    m_text = text;
+    m_text_colour = text_colour;
     Text(text, text_colour);
 }
 //</f>
@@ -94,11 +98,11 @@ void Label::Render(float delta_time, Camera* camera)
     SDL_Rect src{dst};
     src.x = src.y = 0;
 
-    if(m_line_length > 0)
-    {
-        src.w = m_line_length;
-        dst.w = m_line_length;
-    }
+    // if(m_line_length > 0)
+    // {
+    //     src.w = m_line_length;
+    //     dst.w = m_line_length;
+    // }
 
     //apply camera position
     if(!m_transform.ParentViewport())//if inside viewport we cant add camera position
@@ -109,6 +113,8 @@ void Label::Render(float delta_time, Camera* camera)
 
     if(camera->RectInsideCamera(dst))
         m_text_texture.Render(&src, &dst);
+
+    SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &dst);
 
 }
 //</f>
@@ -135,8 +141,8 @@ void Label::Text(const std::string& text, const SDL_Colour& text_colour)
     {
         m_text_texture.Clear();
     }
-
-    m_font_ptr->StringTexture(text, 0, 0, text_colour, m_text_texture.TexturePtr());
+    
+    m_font_ptr->StringTexture(text, 0, 0, text_colour, m_text_texture.TexturePtr(), m_line_length);
 }
 
 void Label::LineLength(int line_length)

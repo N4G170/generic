@@ -4,6 +4,7 @@
 #include <string>
 #include "SDL_image.h"
 #include "sdl_gui_log.hpp"
+#include "sdl_gui_utils.hpp"
 
 namespace sdl_gui
 {
@@ -41,7 +42,10 @@ Button& Button::operator=(const Button& other)
 
 Button& Button::operator=(Button&& other) noexcept
 {
-    m_label_ptr = std::move(other.m_label_ptr);
+    if(this != &other)
+    {
+        m_label_ptr = std::move(other.m_label_ptr);
+    }
     return *this;
 }
 
@@ -67,18 +71,26 @@ void Button::Render(float delta_time, Camera* camera)
 
     BaseButton::Render(delta_time, camera);
 
-    if(m_label_ptr)
-        m_label_ptr->Render(delta_time);
+    if(m_label_ptr){
+        m_label_ptr->Render(delta_time, camera);
+    SDL_Rect r{RectFromStructs(m_label_ptr->GlobalPosition(), m_label_ptr->Size())};
+    SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &r);}
 }
 //</f>
 
-/* < Virtual Methods > */
+/* < Methods > */
 void Button::CreateLabel(const std::string& text, const std::string& font_path, int font_size, const SDL_Colour& text_colour, Position local_position)
 {
     m_label_ptr.reset(new Label(m_main_pointers, local_position, Size()));
     m_label_ptr->Parent(this);
     m_label_ptr->TransformPtr()->LocalPosition(local_position);
     m_label_ptr->ConfigLabel(font_path, font_size, text, text_colour);
+}
+
+void Button::CentreLabel()
+{
+    if(m_label_ptr)
+        m_label_ptr->CentreInParent();
 }
 /* </ Virtual Methods > */
 

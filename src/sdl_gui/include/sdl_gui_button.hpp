@@ -41,8 +41,9 @@ class Button : public BaseButton
         virtual void Render(float delta_time, Camera* camera);
         //</f>
 
-        //<f>  Virtual Methods
-        virtual void CreateLabel(const std::string& text, const std::string& font_path, int font_size, const SDL_Colour& text_colour, Position local_position);
+        //<f>  Methods
+        void CreateLabel(const std::string& text, const std::string& font_path, int font_size, const SDL_Colour& text_colour, Position local_position);
+        void CentreLabel();
         //</f>
 
     protected:

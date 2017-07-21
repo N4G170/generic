@@ -3,23 +3,21 @@
 #include "sdl_gui_constants.hpp"
 #include "sdl_gui_log.hpp"
 #include <memory>
+#include "sdl_gui_utils.hpp"
 
 namespace sdl_gui
 {
 
-BaseButton::BaseButton(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) : GuiElement{main_pointers, position, size},
-    m_box_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)}
+BaseButton::BaseButton(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) : GuiElement{main_pointers, position, size}
 {
+    TransitionType(ButtonTransitionType::COLOUR);//will init m_transition_type & m_current_transition
+    ButtonTransitionCallback(ButtonState::ACTIVE);//will init vars with current state
+
     AddGuiCollider({0,0}, Size(), &m_transform);
 
-
-    m_state_transitions.emplace(ButtonState::ACTIVE, ButtonStateTransition{nullptr, {255,255,255,255}});
-    m_state_transitions.emplace(ButtonState::INACTIVE, ButtonStateTransition{nullptr, {255,255,255,128}});
-    m_state_transitions.emplace(ButtonState::OVER, ButtonStateTransition{nullptr, {200,200,200,255}});
-    m_state_transitions.emplace(ButtonState::PRESSED, ButtonStateTransition{nullptr, {145,145,145,255}});
-
-    m_mouse_interaction.MouseButtonCallback(SDL_BUTTON_LEFT, InputKeyCallbackType::DOWN, std::bind(&BaseButton::ButtonTransitionCallback, this, std::ref(m_state_transitions[ButtonState::PRESSED])));
-    m_mouse_interaction.MouseCallback(MouseCallbackType::OVER, std::bind(&BaseButton::ButtonTransitionCallback, this, std::ref(m_state_transitions[ButtonState::OVER])));
+    //set callbacks
+    m_mouse_interaction.MouseButtonCallback(SDL_BUTTON_LEFT, InputKeyCallbackType::HOLD, std::bind(&BaseButton::ButtonTransitionCallback, this, ButtonState::PRESSED));
+    m_mouse_interaction.MouseCallback(MouseCallbackType::OVER, std::bind(&BaseButton::ButtonTransitionCallback, this, ButtonState::OVER));
 }
 
 BaseButton::~BaseButton() noexcept
@@ -27,24 +25,27 @@ BaseButton::~BaseButton() noexcept
 
 }
 
-BaseButton::BaseButton(const BaseButton& other): GuiElement{other}, m_box_texture{other.m_box_texture}
+BaseButton::BaseButton(const BaseButton& other): GuiElement{other}, m_transition_type{other.m_transition_type}, m_mouse_interaction{other.m_mouse_interaction}
 {
-    //manual copy because std::unique_ptr cannot be copied
-    for(auto& transition : other.m_state_transitions)
-    {
-        SDL_Rect source = *transition.second.source_rect_ptr.get();
-        m_state_transitions.emplace(transition.first, ButtonStateTransition{std::unique_ptr<SDL_Rect>(&source), transition.second.colour});
-    }
+    if(other.m_transition_none_ptr)
+        m_transition_none_ptr.reset(new ButtonTransitionNone(*other.m_transition_none_ptr.get()));
+    if(other.m_transition_colour_ptr)
+        m_transition_colour_ptr.reset(new ButtonTransitionColour(*other.m_transition_colour_ptr.get()));
+    if(other.m_transition_single_image_ptr)
+        m_transition_single_image_ptr.reset(new ButtonTransitionSingleImage(*other.m_transition_single_image_ptr.get()));
+    if(other.m_transition_multi_image_ptr)
+        m_transition_multi_image_ptr.reset(new ButtonTransitionMultiImage(*other.m_transition_multi_image_ptr.get()));
+
+    SelectTransition(other.m_transition_type);
+
 }
 
-BaseButton::BaseButton(BaseButton&& other) noexcept : GuiElement{other}
+BaseButton::BaseButton(BaseButton&& other) noexcept : GuiElement{std::move(other)}, m_transition_type{std::move(other.m_transition_type)},
+    m_transition_none_ptr{std::move(other.m_transition_none_ptr)}, m_transition_colour_ptr{std::move(other.m_transition_colour_ptr)},
+    m_transition_single_image_ptr{std::move(other.m_transition_single_image_ptr)}, m_transition_multi_image_ptr{std::move(other.m_transition_multi_image_ptr)},
+    m_current_transition{other.m_current_transition}, m_mouse_interaction{std::move(other.m_mouse_interaction)}
 {
-    if(&other != this)
-    {
-        m_state_transitions = std::move(other.m_state_transitions);
-        m_box_texture = std::move(other.m_box_texture);
-        m_mouse_interaction = std::move(other.m_mouse_interaction);
-    }
+
 }
 
 BaseButton& BaseButton::operator=(const BaseButton& other)
@@ -62,8 +63,13 @@ BaseButton& BaseButton::operator=(BaseButton&& other) noexcept
 {
     if(&other != this)
     {
-        m_state_transitions = std::move(other.m_state_transitions);
-        m_box_texture = std::move(other.m_box_texture);
+        GuiElement::operator=(std::move(other));
+        m_transition_type = std::move(other.m_transition_type);
+        m_transition_none_ptr = std::move(other.m_transition_none_ptr);
+        m_transition_colour_ptr = std::move(other.m_transition_colour_ptr);
+        m_transition_single_image_ptr = std::move(other.m_transition_single_image_ptr);
+        m_transition_multi_image_ptr = std::move(other.m_transition_multi_image_ptr);
+        m_current_transition = other.m_current_transition;
         m_mouse_interaction = std::move(other.m_mouse_interaction);
     }
 
@@ -88,12 +94,12 @@ void BaseButton::Logic(float delta_time)
 {
     if(m_active)//btn is active
     {
-        ButtonTransitionCallback(m_state_transitions[ButtonState::ACTIVE]);
+        ButtonTransitionCallback(ButtonState::ACTIVE);
 
         m_mouse_interaction.Logic(delta_time);
     }
     else
-        ButtonTransitionCallback(m_state_transitions[ButtonState::INACTIVE]);
+        ButtonTransitionCallback(ButtonState::INACTIVE);
 }
 
 void BaseButton::Render(float delta_time)
@@ -116,45 +122,61 @@ void BaseButton::Render(float delta_time, Camera* camera)
     }
 
     if(camera->RectInsideCamera(dst))
-        m_box_texture.Render(m_current_source_rect, &dst);
+    {
+        m_current_transition->Render(dst);
+    }
 }
 //</f>
 
-//<f> Virtual Methods
-void BaseButton::SetStateColour(ButtonState button_state, const SDL_Colour& colour)
-{
-    m_state_transitions[button_state].colour = colour;
-}
 
-void BaseButton::SetStateColours(const SDL_Colour& inactive, const SDL_Colour& active, const SDL_Colour& over, const SDL_Colour& pressed)
-{
-    m_state_transitions[ButtonState::INACTIVE].colour = inactive;
-    m_state_transitions[ButtonState::ACTIVE].colour = active;
-    m_state_transitions[ButtonState::OVER].colour = over;
-    m_state_transitions[ButtonState::PRESSED].colour = pressed;
-}
-
-void BaseButton::SetStateTextureSrcRect(ButtonState button_state, const SDL_Rect& rect)
-{
-    m_state_transitions[button_state].source_rect_ptr.reset(new SDL_Rect{rect});
-}
-
-void BaseButton::SetStateTextureSrcRect(const SDL_Rect& inactive, const SDL_Rect& active, const SDL_Rect& over, const SDL_Rect& pressed)
-{
-    m_state_transitions[ButtonState::INACTIVE].source_rect_ptr.reset(new SDL_Rect{inactive});
-    m_state_transitions[ButtonState::ACTIVE].source_rect_ptr.reset(new SDL_Rect{active});
-    m_state_transitions[ButtonState::OVER].source_rect_ptr.reset(new SDL_Rect{over});
-    m_state_transitions[ButtonState::PRESSED].source_rect_ptr.reset(new SDL_Rect{pressed});
-}
-//</f>
 
 //<f> Getters/Setters
-
+void BaseButton::TransitionType(ButtonTransitionType type)
+{
+    DeleteTransition(m_transition_type);
+    CreateTransition(type);
+    SelectTransition(type);
+    m_transition_type = type;
+}
 //</f>
 
-void BaseButton::ButtonTransitionCallback(const ButtonStateTransition& transition)
+void BaseButton::ButtonTransitionCallback(ButtonState state)
 {
-    m_box_texture.ColourModulation(transition.colour);
-    m_current_source_rect = transition.source_rect_ptr.get();
+    m_current_transition->ChangeState(state);
 }
+
+void BaseButton::DeleteTransition(ButtonTransitionType type)
+{
+    switch(type)
+    {
+        case ButtonTransitionType::NONE: m_transition_none_ptr.reset(); return;
+        case ButtonTransitionType::COLOUR: m_transition_colour_ptr.reset(); return;
+        case ButtonTransitionType::SINGLE_IMAGE: m_transition_single_image_ptr.reset(); return;
+        case ButtonTransitionType::MULTI_IMAGE: m_transition_multi_image_ptr.reset(); return;
+    }
 }
+
+void BaseButton::CreateTransition(ButtonTransitionType type)
+{
+    switch(type)
+    {
+        case ButtonTransitionType::NONE: m_transition_none_ptr.reset(new ButtonTransitionNone(m_main_pointers.resource_manager_ptr)); return;
+        case ButtonTransitionType::COLOUR: m_transition_colour_ptr.reset(new ButtonTransitionColour(m_main_pointers.resource_manager_ptr)); return;
+        case ButtonTransitionType::SINGLE_IMAGE: m_transition_single_image_ptr.reset(new ButtonTransitionSingleImage(m_main_pointers.resource_manager_ptr)); return;
+        case ButtonTransitionType::MULTI_IMAGE: m_transition_multi_image_ptr.reset(new ButtonTransitionMultiImage(m_main_pointers.resource_manager_ptr)); return;
+    }
+}
+
+
+void BaseButton::SelectTransition(ButtonTransitionType type)
+{
+    switch(type)
+    {
+        case ButtonTransitionType::NONE: m_current_transition = m_transition_none_ptr.get(); return;
+        case ButtonTransitionType::COLOUR: m_current_transition = m_transition_colour_ptr.get(); return;
+        case ButtonTransitionType::SINGLE_IMAGE: m_current_transition = m_transition_single_image_ptr.get(); return;
+        case ButtonTransitionType::MULTI_IMAGE: m_current_transition = m_transition_multi_image_ptr.get(); return;
+    }
+}
+
+}//namespace

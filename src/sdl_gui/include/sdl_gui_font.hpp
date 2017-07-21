@@ -63,7 +63,11 @@ class Font
 
         // bool CharTexture(const char& character, int font_size, int origin_x, int origin_y, SDL_Colour font_colour, Texture* output_texture);
 
-        //0 means no limit. if line_length < letter width, 1 char per line
+        /**
+         * \brief Renders the text onto the output_texture starting at position origin_x and origin_y.
+         * \param font_colour Note: the alpha value can be used
+         * \param line_length    0 means no limit. if line_length < letter width, 1 char per line
+         */
         bool StringTexture(const std::string& text, int origin_x, int origin_y, SDL_Colour font_colour, SDL_Texture* output_texture, int line_length = 0);
 
         /**

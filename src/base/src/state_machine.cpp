@@ -6,6 +6,7 @@
 #include "solar_system.hpp"
 #include "map_demo.hpp"
 #include "influence_wars.hpp"
+#include "particles_state.hpp"
 #include <iostream>
 
 StateMachine::StateMachine(SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr, bool* quit_flag): m_quit_flag{quit_flag},
@@ -72,6 +73,10 @@ void StateMachine::ChangeState(const std::string& state)
     else if(state == StateName::Influence_Wars)
     {
         m_current_state.reset(new InfluenceWars(this, StateName::Influence_Wars, m_renderer_ptr, m_resource_manager_ptr));
+    }
+    else if(state == StateName::Particles)
+    {
+        m_current_state.reset(new ParticleState(this, StateName::Particles, m_renderer_ptr, m_resource_manager_ptr));
     }
     m_current_state->Enter();//enter new state (selected in if else block)
 }

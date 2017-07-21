@@ -2,6 +2,7 @@
 #include <utility>
 #include "sdl_gui_log.hpp"
 #include "sdl_gui_element.hpp"
+#include "sdl_gui_utils.hpp"
 
 namespace sdl_gui
 {
@@ -99,6 +100,20 @@ bool ColliderShape::CirclePointCollision(int mouse_x, int mouse_y)
     return (x * x + y * y) <= m_squared_radius;
 }
 
+void ColliderShape::DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour)
+{
+    SDL_SetRenderDrawColor(renderer_ptr, colour.r, colour.g, colour.b, colour.a);
+
+    if(m_type == ColliderShapeType::BOX)
+    {
+        SDL_Rect rect = RectFromStructs(m_local_position + m_owner_transform->GlobalPosition(), m_dimensions);
+        SDL_RenderDrawRect(renderer_ptr, &rect);
+    }
+    else if(m_type == ColliderShapeType::CIRCLE)
+    {
+        Log("Circle debug not implemented\n");
+    }
+}
 // </f> < GUI_COLLIDER_SHAPE >
 
 
@@ -178,6 +193,12 @@ bool Collider::IsPointColliding(int mouse_x, int mouse_y)
             return true;
     }
     return false;
+}
+
+void Collider::DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour)
+{
+    for(ColliderShape shape : m_shapes)
+        shape.DebugRender(renderer_ptr, colour);
 }
 
 // </f> < GUI_COLLIDER >

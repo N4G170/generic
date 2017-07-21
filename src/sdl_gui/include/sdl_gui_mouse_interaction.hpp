@@ -76,6 +76,7 @@ class MouseInteraction
         //</f>
 
         //<f> Getters/Setters
+        int MouseFlag() const { return m_mouse_flags; }
         /**
          * \brief Get current valid click time limit
          */

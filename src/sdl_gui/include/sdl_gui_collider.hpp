@@ -28,6 +28,8 @@ class ColliderShape
         ColliderShape& operator= (ColliderShape&& other);
 
         std::function<bool(int,int)> IsPointColliding;
+
+        void DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour = {0,0,0,255});
     protected:
         ColliderShapeType m_type;
 
@@ -74,6 +76,8 @@ class Collider
 
         void SetColliderShape(const Position& position, const Dimensions& dimensions);
         void SetColliderShape(const Position& centre_position, int circle_radius);
+
+        void DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour = {0,0,0,255});
 
     private:
         // vars and stuff

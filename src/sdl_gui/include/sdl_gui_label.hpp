@@ -52,7 +52,13 @@ class Label : public GuiElement
         std::string Text();
         void Text(const std::string& text, const SDL_Colour& text_colour = {0,0,0,255});
 
+        /**
+         * \brief Line Length in px
+         */
         int LineLength() const { return m_line_length; }
+        /**
+         * \brief Line Length in px. If <=0 no limit
+         */
         void LineLength(int line_length);
         //</f>
 

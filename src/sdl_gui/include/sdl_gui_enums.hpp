@@ -19,6 +19,13 @@ enum class AnchorType
 // </f>
 
 //<f> Interaction
+enum class ButtonTransitionType
+{
+    NONE,           ///< No transition
+    COLOUR,         ///< Change button colour
+    SINGLE_IMAGE,   ///< Change button image. One image were we select the rect to render
+    MULTI_IMAGE     ///< Change button image. Ome image per state
+};
 
 /**
  * \brief Button transition states
@@ -27,7 +34,7 @@ enum class ButtonState
 {
     INACTIVE,   ///< Button is inactive, cannot be interacted with
     ACTIVE,     ///< Button is active, can be interacted with
-    OVER,      ///< Button has "something"(usually mouse) hovering it
+    OVER,       ///< Button has "something"(usually mouse) hovering it
     PRESSED     ///< Button was pressed
 };
 
@@ -36,10 +43,11 @@ enum class ButtonState
  */
 enum class MouseStateFlags
 {
-    NONE = 0,               ///< Clear state
-    ENTER = 1,        ///< Mouse entered the detection area
-    EXIT = 2,         ///< Mouse left the detection area
-    OVER = 4,        ///< Mouse is inside the detection area
+    NONE = 0,   ///< Clear state
+    ENTER = 1,  ///< Mouse entered the detection area
+    EXIT = 2,   ///< Mouse left the detection area
+    OVER = 4,   ///< Mouse is inside the detection area
+    MOVE = 8    ///< Mouse moved
 };
 /**
  * \brief Mouse button interaction state flags
@@ -58,8 +66,9 @@ enum class InputKeyStateFlags
 enum class MouseCallbackType
 {
     ENTER,      ///< Mouse entered detection area
-    OVER,      ///< Mouse is inside detection area
+    OVER,       ///< Mouse is inside detection area
     EXIT,       ///< Mouse left detection area
+    MOVE,       ///< Mouse moved
 };
 /**
  * \brief Mouse button actions available for use with callbacks

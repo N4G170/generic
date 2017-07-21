@@ -1,5 +1,6 @@
 #include "resource_manager.hpp"
 #include <utility>
+#include "SDL_image.h"
 
 ResourceManager::ResourceManager(SDL_Renderer* renderer_ptr): m_renderer_ptr{renderer_ptr}
 {
@@ -8,38 +9,60 @@ ResourceManager::ResourceManager(SDL_Renderer* renderer_ptr): m_renderer_ptr{ren
 
 ResourceManager::~ResourceManager() noexcept
 {
-    m_textures.clear();
+    m_renderer_ptr = nullptr;
+}
+
+ResourceManager::ResourceManager(const ResourceManager& other): m_renderer_ptr{other.m_renderer_ptr}
+{
+
 }
 
 ResourceManager::ResourceManager(ResourceManager&& other) noexcept
 {
-
+    m_renderer_ptr = std::move(other.m_renderer_ptr);
 }
 
-ResourceManager& ResourceManager::operator=(ResourceManager&& other) noexcept
+ResourceManager& ResourceManager::operator=(const ResourceManager& other)
 {
-    //we are moving the object to itself
-    if(this == &other)
-        return *this;
-
-    m_renderer_ptr = std::move(other.m_renderer_ptr);
-    m_textures = std::move(other.m_textures);
+    if(this != &other)//not same ref
+    {
+        ResourceManager tmp(other);
+        *this = std::move(tmp);
+    }
 
     return *this;
 }
 
-void ResourceManager::LoadTexture(const std::string &source_path)
+ResourceManager& ResourceManager::operator=(ResourceManager&& other) noexcept
 {
-    if(m_textures.find(source_path) != m_textures.end())//element exists
-        return;
+    this->m_renderer_ptr = std::move(other.m_renderer_ptr);
 
-    m_textures.emplace(std::make_pair(source_path, Texture(source_path, m_renderer_ptr)));
+    return *this;
 }
 
-void ResourceManager::LoadTexture(const std::vector<std::string> &source_paths)
-{
-    for(const std::string& path : source_paths)
-    {
-        LoadTexture(path);
-    }
-}
+// Texture ResourceManager::GetTexture(const std::string& texture_path)
+// {
+//     if(m_sdl_textures.find(texture_path) == std::end(m_sdl_textures))//did not find it
+//     {
+//         SDL_Surface* image = IMG_Load(texture_path.data());
+//         if(image)//image loaded
+//         {
+//             SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer_ptr, image);
+//             if(texture)
+//             {
+//                 m_sdl_textures[texture_path] = std::move(texture);
+//             }
+//             else
+//             {
+//                 // Log("Failed to create texture from surface. Line: "+std::string{__LINE__}+" File: "+std::string{__FILE__});
+//                 return {};
+//             }
+//         }
+//         else
+//         {
+//             // Log("Failed to create surface from file. Line: "+std::string{__LINE__}+" File: "+std::string{__FILE__});
+//             return {};
+//         }
+//     }
+//     // return Texture{m_renderer_ptr, m_sdl_textures[texture_path]};
+// }

@@ -1,4 +1,5 @@
 #include "SDL.h"
+#include <string>
 
 namespace sdl_gui
 {
@@ -11,7 +12,7 @@ class Texture
     public:
         /* Default constructor */
         Texture();
-        Texture(SDL_Renderer* renderer_ptr, SDL_Texture* texture_ptr);
+        Texture(SDL_Renderer* renderer_ptr, SDL_Texture* texture_ptr, const std::string& image_path);
         /* Default destructor */
         virtual ~Texture() noexcept;
 
@@ -25,23 +26,30 @@ class Texture
         /* Move operator */
         Texture& operator= (Texture&& other) noexcept;
 
-        /* < Getters/Setters > */
-        SDL_Rect* SourceRect() const { return m_src_rect; };
-        void SourceRect(SDL_Rect src_rect);
-        SDL_Rect* DestinationRect() const { return m_dst_rect; };
-        void DestinationRect(SDL_Rect dst_rect);
-        void ClearSourceRect();
-        void ClearDestinationRect();
-        SDL_Colour ColourModulation() const { return m_colour_modulation; };
-        void ColourModulation(const SDL_Colour& colour);
-        int AlphaModulation() const { return m_colour_modulation.a; };
-        void AlphaModulation(int alpha){ m_colour_modulation.a = alpha;};
-        /* < /Getters/Setters > */
+        //<f> Getters/Setters
+        void ColourModulation(const SDL_Colour& colour){ m_colour_modulation = colour; }
+        SDL_Colour ColourModulation() const { return m_colour_modulation; }
 
-        void Render();
+        Uint8 RedModulation() const { return m_colour_modulation.b; }
+        void RedModulation(Uint8 red){ m_colour_modulation.b = red;}
+
+        Uint8 GreenModulation() const { return m_colour_modulation.b; }
+        void GreenModulation(Uint8 green){ m_colour_modulation.b = green;}
+
+        Uint8 BlueModulation() const { return m_colour_modulation.b; }
+        void BlueModulation(Uint8 blue){ m_colour_modulation.b = blue;}
+
+        Uint8 AlphaModulation() const { return m_colour_modulation.a; }
+        void AlphaModulation(Uint8 alpha){ m_colour_modulation.a = alpha;}
+
+        void ChangeTexturePtr(SDL_Texture* new_texture) { m_texture_ptr = new_texture; }
+
+        std::string ImagePath() const { return m_image_path; }
+        //</f>
+
         void Render(SDL_Rect* src_rect, SDL_Rect* dst_rect);
 
-        SDL_Texture* DuplicateTexture();
+        // SDL_Texture* DuplicateTexture();
 
     private:
         // vars and stuff
@@ -50,11 +58,8 @@ class Texture
         //Texture DOES NOT OWN THIS POINTER IF m_manage_memory == FALSE
         SDL_Texture* m_texture_ptr;
 
-        SDL_Rect* m_src_rect;
-        SDL_Rect* m_dst_rect;
         SDL_Colour m_colour_modulation;
-
-        void ColourModulation(Uint8 r, Uint8 g, Uint8 b);
+        std::string m_image_path;
 };
 
 #endif //TEXTURE_HPP

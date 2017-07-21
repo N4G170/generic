@@ -9,6 +9,9 @@
 #include "sdl_gui_progress_bar.hpp"
 #include "sdl_gui_slider.hpp"
 #include "sdl_gui_textbox.hpp"
+#include "sdl_gui_tooltip.hpp"
+#include "sdl_gui_camera.hpp"
+#include <memory>
 
 namespace sdl_gui
 {
@@ -19,8 +22,8 @@ class GuiManager
 {
     public:
         //<f> Constructors & operator=
-        /* Default constructor */
-        GuiManager();
+        /* Base constructor */
+        GuiManager(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr);
         /* Default destructor */
         virtual ~GuiManager() noexcept;
 
@@ -50,9 +53,9 @@ class GuiManager
          * \brief Create a new element to be managed by the manager. Returns a pointer to said element
          */
         template<typename T>
-        T* CreateElement(const GuiMainPointers& main_pointers, const Position& position, const Dimensions& size)
+        T* CreateElement(const Position& position, const Dimensions& size)
         {
-            T* element = new T{main_pointers, position, size};
+            T* element = new T{{m_renderer_ptr, m_resource_manager_ptr, m_main_camera_ptr.get()}, position, size};
             m_elements.emplace(element->ElementUID(), element);
             return dynamic_cast<T*>(m_elements[element->ElementUID()].get());
         }
@@ -62,9 +65,9 @@ class GuiManager
          * \nYOU ARE RESPONSIBLE FOR MANAGING IT
          */
         template<typename T>
-        T* CreateFreeElement(const GuiMainPointers& main_pointers, const Position& position, const Dimensions& size)
+        T* CreateFreeElement(const Position& position, const Dimensions& size)
         {
-            return new T {main_pointers, position, size};
+            return new T {{m_renderer_ptr, m_resource_manager_ptr, m_main_camera_ptr.get()}, position, size};
         }
 
         /**
@@ -94,9 +97,16 @@ class GuiManager
         void ClearElementsInput();
 
         //</f>
+
+        //<f>
+        Camera* GuiCamera() { return m_main_camera_ptr.get(); }
+        //</f>
     private:
         // vars and stuff
         std::unordered_map<UID, std::unique_ptr<GuiElement>> m_elements;
+        SDL_Renderer* m_renderer_ptr;
+        ResourceManager* m_resource_manager_ptr;
+        std::unique_ptr<Camera> m_main_camera_ptr;
 };
 
 #endif //GUI_MANAGER_HPP

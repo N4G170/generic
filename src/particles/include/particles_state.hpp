@@ -1,23 +1,21 @@
 #ifndef PARTICLE_STATE_HPP
 #define PARTICLE_STATE_HPP
 
-#include <vector>
-#include <utility>
-#include "constants.hpp"
 #include "state_interface.hpp"
+#include "sdl_gui_manager.hpp"
 
 class ParticleState : public StateInterface
 {
     public:
         //<f> Constructors & operator=
-        ParticleState(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
-        virtual ~ParticleState();
+        ParticleState(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr);
+        virtual ~ParticleState() noexcept;
 
         ParticleState(const ParticleState& other);
-        ParticleState(ParticleState&& other);
+        ParticleState(ParticleState&& other) noexcept;
 
         ParticleState& operator= (const ParticleState& other);
-        ParticleState& operator= (ParticleState&& other);
+        ParticleState& operator= (ParticleState&& other) noexcept;
 
         //</f>
 
@@ -37,7 +35,11 @@ class ParticleState : public StateInterface
          */
         virtual void Render(SDL_Renderer*, float delta_time);
         //</f>
+
+        void BackToMenuCallback();
     private:
+
+        sdl_gui::GuiManager m_gui_manager;
 
 };
 

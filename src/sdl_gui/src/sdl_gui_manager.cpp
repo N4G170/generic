@@ -5,7 +5,8 @@
 namespace sdl_gui
 {
 //<f> Constructors & operator=
-GuiManager::GuiManager()
+GuiManager::GuiManager(SDL_Renderer* renderer_ptr, ResourceManager* resource_manager_ptr): m_renderer_ptr{renderer_ptr}, m_resource_manager_ptr{resource_manager_ptr},
+    m_main_camera_ptr{new Camera({0,0},{2000,2000})}
 {
 
 }
@@ -15,12 +16,14 @@ GuiManager::~GuiManager() noexcept
 
 }
 
-GuiManager::GuiManager(const GuiManager& other)
+GuiManager::GuiManager(const GuiManager& other) : m_renderer_ptr{other.m_renderer_ptr}, m_resource_manager_ptr{other.m_resource_manager_ptr},
+    m_main_camera_ptr{new Camera(*other.m_main_camera_ptr.get())}
 {
 
 }
 
-GuiManager::GuiManager(GuiManager&& other) noexcept
+GuiManager::GuiManager(GuiManager&& other) noexcept : m_renderer_ptr{std::move(other.m_renderer_ptr)}, m_resource_manager_ptr{std::move(other.m_resource_manager_ptr)},
+    m_main_camera_ptr{std::move(other.m_main_camera_ptr)}
 {
 
 }
@@ -38,6 +41,12 @@ GuiManager& GuiManager::operator=(const GuiManager& other)
 
 GuiManager& GuiManager::operator=(GuiManager&& other) noexcept
 {
+    if(this != &other)
+    {
+        m_renderer_ptr = std::move(other.m_renderer_ptr);
+        m_resource_manager_ptr = std::move(other.m_resource_manager_ptr);
+        m_main_camera_ptr = std::move(other.m_main_camera_ptr);
+    }
     return *this;
 }
 //</f>

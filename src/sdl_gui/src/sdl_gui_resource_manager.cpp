@@ -48,7 +48,7 @@ Texture ResourceManager::GetTexture(const std::string& texture_path)
 {
     if(m_sdl_textures.find(texture_path) == std::end(m_sdl_textures))//did not find it
     {
-        SDL_Surface* image = IMG_Load(texture_path.data());
+        SDL_Surface* image = IMG_Load(texture_path.data());//load new
         if(image)//image loaded
         {
             SDL_Texture* texture = SDL_CreateTextureFromSurface(m_renderer_ptr, image);
@@ -68,7 +68,7 @@ Texture ResourceManager::GetTexture(const std::string& texture_path)
             return {};
         }
     }
-    return Texture{m_renderer_ptr, m_sdl_textures[texture_path]};
+    return Texture{m_renderer_ptr, m_sdl_textures[texture_path], texture_path};//create new Texture object
 }
 
 Font* ResourceManager::GetFont(const std::string& font_path, int font_size)

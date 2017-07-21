@@ -68,6 +68,12 @@ void MouseInteraction::Input(const SDL_Event& event, const std::vector<Collider>
         //over
         m_mouse_flags |= ToInnerType(MouseStateFlags::OVER);//add
 
+        //moved
+        if(event.type == SDL_MOUSEMOTION)
+            m_mouse_flags |= ToInnerType(MouseStateFlags::MOVE);//add
+        else
+            m_mouse_flags &= ~ToInnerType(MouseStateFlags::MOVE);//remove
+
         //Mouse buttons input
         auto mouse_button_event = event.button;//SDL_MouseButtonEvent
         for(auto& btn_pair : m_mouse_buttons)
@@ -90,11 +96,14 @@ void MouseInteraction::Input(const SDL_Event& event, const std::vector<Collider>
     }
     else//outside detection area
     {
-        int over{m_mouse_flags & ToInnerType(MouseStateFlags::OVER)};//store previous over flag
-        m_mouse_flags = ToInnerType(MouseStateFlags::NONE);//clear flags
+        //Flag clear is made after processing exit flag at MouseLogic function
+        //m_mouse_flags = ToInnerType(MouseStateFlags::NONE);//clear flags
 
-        if(over && !inside_collider)//we exit the button
+        if(IsFlagActive(m_mouse_flags, MouseStateFlags::OVER))//we exit the button
+        {
             m_mouse_flags |= ToInnerType(MouseStateFlags::EXIT);//add
+            m_mouse_flags &= ~ToInnerType(MouseStateFlags::OVER);//add
+        }
 
         //clear all buttons
         for(auto& btn : m_mouse_buttons)
@@ -160,6 +169,7 @@ void MouseInteraction::MouseLogic(float delta_time, float& valid_click_timer)
     {
         if(m_mouse_callbacks[MouseCallbackType::ENTER])//calback exists
             m_mouse_callbacks[MouseCallbackType::ENTER]();
+
         //remove flag
         m_mouse_flags &= ~ToInnerType(MouseStateFlags::ENTER);
     }
@@ -169,13 +179,21 @@ void MouseInteraction::MouseLogic(float delta_time, float& valid_click_timer)
         if(m_mouse_callbacks[MouseCallbackType::OVER])//calback exists
             m_mouse_callbacks[MouseCallbackType::OVER]();
     }
+    //mouse move
+    if(IsFlagActive(m_mouse_flags, MouseStateFlags::MOVE))
+    {
+        if(m_mouse_callbacks[MouseCallbackType::MOVE])//calback exists
+            m_mouse_callbacks[MouseCallbackType::MOVE]();
+        m_mouse_flags &= ~ToInnerType(MouseStateFlags::MOVE);//remove
+    }
     //mouse exit
     if(IsFlagActive(m_mouse_flags, MouseStateFlags::EXIT))
     {
         if(m_mouse_callbacks[MouseCallbackType::EXIT])//calback exists
             m_mouse_callbacks[MouseCallbackType::EXIT]();
+
         //remove flag
-        m_mouse_flags &= ~ToInnerType(MouseStateFlags::EXIT);
+        m_mouse_flags = ToInnerType(MouseStateFlags::NONE);//clear flags
     }
 
     //process buttons flags

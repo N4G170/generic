@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "texture.hpp"//includes SDL2
+#include "texture.hpp"
+#include "SDL.h"
 
 class ResourceManager
 {
@@ -15,25 +16,24 @@ class ResourceManager
         virtual ~ResourceManager() noexcept;
 
         /* Copy constructor */
-        ResourceManager(const ResourceManager& other) = delete;
+        ResourceManager(const ResourceManager& other);
         /* Move constructor */
         ResourceManager(ResourceManager&& other) noexcept;
 
         /* Copy operator */
-        ResourceManager& operator= (const ResourceManager& other) = delete;
+        ResourceManager& operator= (const ResourceManager& other);
         /* Move operator */
         ResourceManager& operator= (ResourceManager&& other) noexcept;
 
-        //textures
-        void LoadTexture(const std::string& source_path);
-        void LoadTexture(const std::vector<std::string>& source_paths);
-
-        Texture* GetTexture(const std::string& source_path);
-
+        Texture GetTexture(const std::string& texture_path);
+        // Font* GetFont(const std::string& font_path, int font_size);
     private:
         // vars and stuff
+        /* This class IS NOT THE OWNER OF THS POINTER */
         SDL_Renderer* m_renderer_ptr;
-        std::map<std::string, Texture> m_textures;
+
+        std::map<std::string, SDL_Texture*> m_sdl_textures;
+        // std::map<std::string, std::map<int, std::unique_ptr<Font>>> m_fonts;
 };
 
 #endif //RESOURCE_MANAGER_HPP

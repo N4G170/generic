@@ -1,26 +1,21 @@
 #include "sdl_gui_element.hpp"
 #include "sdl_gui_image.hpp"
 #include "sdl_gui_mouse_interaction.hpp"
+#include "sdl_gui_enums.hpp"
 #include <memory>
 #include <unordered_map>
+#include <utility>
+#include "sdl_gui_button_transition.hpp"
+#include "sdl_gui_button_transition_none.hpp"
+#include "sdl_gui_button_transition_colour.hpp"
+#include "sdl_gui_button_transition_single_image.hpp"
+#include "sdl_gui_button_transition_multi_image.hpp"
 
 namespace sdl_gui
 {
 
 #ifndef SDL_GUI_BASE_BUTTON_HPP
 #define SDL_GUI_BASE_BUTTON_HPP
-
-struct ButtonStateTransition
-{
-    /**
-     * Source area of the image to be used as this state transition
-    */
-    std::unique_ptr<SDL_Rect> source_rect_ptr;
-    /**
-     * \brief Color to be applied on the texture (will be reset after rendering)
-     */
-    SDL_Colour colour;
-};
 
 class BaseButton : public GuiElement
 {
@@ -53,46 +48,43 @@ class BaseButton : public GuiElement
         virtual void Render(float delta_time, Camera* camera);
         //</f>
 
-        //<f> Virtual Methods
-        /**
-         * \brief Set the colour to be applied to on a specific button state
-         */
-        virtual void SetStateColour(ButtonState button_state, const SDL_Colour& colour);
-        /**
-         * \brief Set the colour to be applied to on a each of the button state
-         */
-        virtual void SetStateColours(const SDL_Colour& inactive, const SDL_Colour& active, const SDL_Colour& over, const SDL_Colour& pressed);
-        /**
-         * \brief Set the source area of the image to be rendered on a specific button state
-         */
-        virtual void SetStateTextureSrcRect(ButtonState button_state, const SDL_Rect& rect);
-        /**
-         * \brief Set the source area of the image to be rendered on each of the button state
-         */
-        virtual void SetStateTextureSrcRect(const SDL_Rect& inactive, const SDL_Rect& active, const SDL_Rect& over, const SDL_Rect& pressed);
+        //<f> Methods
         //</f>
 
         //<f> Getters/Setters
+        ButtonTransitionType TransitionType() const { return m_transition_type; }
+        void TransitionType(ButtonTransitionType);
+
         MouseInteraction* MouseInteractionPtr() { return &m_mouse_interaction; }
+
+        ButtonTransitionNone* TransitionNonePtr() { return m_transition_none_ptr.get(); }
+        ButtonTransitionColour* TransitionColourPtr() { return m_transition_colour_ptr.get(); }
+        ButtonTransitionSingleImage* TransitionSingleImagePtr() { return m_transition_single_image_ptr.get(); }
+        ButtonTransitionMultiImage* TransitionMultiImagePtr() { return m_transition_multi_image_ptr.get(); }
         //</f>
 
     protected:
         // vars and stuff
-        // std::map<ButtonState, Texture> m_status_texture;
-        std::unordered_map<ButtonState, ButtonStateTransition> m_state_transitions;
+        ButtonTransitionType m_transition_type;
 
-        // Texture m_current_texture;
-        Texture m_box_texture;
-        // Image m_box_texture;
+        std::unique_ptr<ButtonTransitionNone> m_transition_none_ptr;
+        std::unique_ptr<ButtonTransitionColour> m_transition_colour_ptr;
+        std::unique_ptr<ButtonTransitionSingleImage> m_transition_single_image_ptr;
+        std::unique_ptr<ButtonTransitionMultiImage> m_transition_multi_image_ptr;
+
+        ButtonTransition* m_current_transition;
 
         //interaction
         MouseInteraction m_mouse_interaction;
-        SDL_Rect* m_current_source_rect;
 
         // std::function<void()> TransitionLogic;
         // void ColourTransitionLogic();
         // void TextureTransitionLogic();
-        void ButtonTransitionCallback(const ButtonStateTransition& transition);
+        void ButtonTransitionCallback(ButtonState state);
+
+        void DeleteTransition(ButtonTransitionType);
+        void CreateTransition(ButtonTransitionType);
+        void SelectTransition(ButtonTransitionType);
 };
 
 #endif //SDL_GUI_BASE_BUTTON_HPP
