@@ -1,4 +1,5 @@
 #include "sdl_gui_utils.hpp"
+#include "cmath"
 
 namespace sdl_gui
 {
@@ -32,12 +33,12 @@ bool RectIntersect(const SDL_Rect& rect_1, const SDL_Rect& rect_2)
 //rect casts
 SDL_Rect RectFromFloats(float x, float y, float w, float h)
 {
-    return {static_cast<int>(x), static_cast<int>(y), static_cast<int>(w), static_cast<int>(h)};
+    return {static_cast<int>(std::round(x)), static_cast<int>(std::round(y)), static_cast<int>(std::round(w)), static_cast<int>(std::round(h))};
 }
 
 SDL_Rect RectFromStructs(Position position, Dimensions size)
 {
-    return {static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(size.w), static_cast<int>(size.h)};
+    return {static_cast<int>(std::round(position.x)), static_cast<int>(std::round(position.y)), static_cast<int>(std::round(size.w)), static_cast<int>(std::round(size.h))};
 }
 
 //position cast
@@ -73,6 +74,10 @@ std::string ToString(const Position& position, const Dimensions& size)
 {
     return "("+std::to_string(position.x)+", "+std::to_string(position.y)+") ["+std::to_string(size.w)+", "+std::to_string(size.h)+"]";
 }
+//</f>
+
+//<f> Math
+
 //</f>
 
 }//namespace

@@ -120,11 +120,6 @@ void Label::Render(float delta_time, Camera* camera)
 //</f>
 
 //<f> Getters/Setters
-std::string Label::Text()
-{
-    return m_text;
-}
-
 void Label::Text(const std::string& text, const SDL_Colour& text_colour)
 {
     m_text_colour = text_colour;
@@ -132,16 +127,16 @@ void Label::Text(const std::string& text, const SDL_Colour& text_colour)
     m_font_ptr->CalculateTextTextureSize(text, &w, &h, m_line_length);
     Dimensions size{Size()};
 
-    if(w > size.w || h > size.h)//current texture is too small
+    if(w == size.w && h == size.h)//same size
+    {
+         m_text_texture.Clear();
+    }
+    else//resize texture
     {
         Size({static_cast<float>(w),static_cast<float>(h)});
         m_text_texture.TexturePtr(CreateSDLTexture(m_main_pointers.main_renderer_ptr, w,h));
     }
-    else
-    {
-        m_text_texture.Clear();
-    }
-    
+
     m_font_ptr->StringTexture(text, 0, 0, text_colour, m_text_texture.TexturePtr(), m_line_length);
 }
 

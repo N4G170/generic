@@ -1,6 +1,9 @@
 #include "sdl_gui_element.hpp"
-#include "sdl_gui_texture.hpp"
 #include "sdl_gui_label.hpp"
+#include "sdl_gui_image.hpp"
+#include "sdl_gui_mouse_interaction.hpp"
+#include "sdl_gui_enums.hpp"
+#include <string>
 
 namespace sdl_gui
 {
@@ -29,31 +32,48 @@ class Textbox : public GuiElement
         //</f>
 
         //<f> Overrides GuiElement
-        // virtual void Input(const SDL_Event& event);
+        virtual void Input(const SDL_Event& event);
 
         // virtual void FixedLogic(float fixed_delta_time);
-        // virtual void Logic(float delta_time);
+        virtual void Logic(float delta_time);
 
         virtual void Render(float delta_time);
         virtual void Render(float delta_time, Camera* camera);
         //</f>
 
         //<f> Virtual Methods
-
+        virtual void Focus();
+        virtual void UnFocus();
         //</f>
 
         //<f> Getters/Setters
+        std::string Text() const { return m_text_label.Text(); }
 
+        TextboxInputType InputType() const { return m_input_type; }
+        void InputType(TextboxInputType input_type) { m_input_type = input_type; }
         //</f>
+
+
 
     protected:
         // vars and stuff
-        Texture m_bg_texture;
-        SDL_Rect m_edit_field_rect;
+        Image m_bg_image;
+        SDL_Rect m_viewport_rect;
 
         Label m_text_label;
+        Label m_caret_label;
+        Label* m_label_to_render;
+        std::string m_text;
+        std::string m_text_representation;
+        std::string m_default_text;
 
-        void CentreLabel();
+        float m_blink_time_limit;
+        float m_blink_time;
+
+        int m_character_limit;
+        TextboxInputType m_input_type;
+
+        MouseInteraction m_mouse_interaction;
 };
 
 #endif //SDL_GUI_TEXTBOX_HPP

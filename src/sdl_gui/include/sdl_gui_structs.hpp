@@ -17,9 +17,9 @@ struct Position
     float x, y, z;
     bool operator == (const Position& other){ return other.x == x && other.y == y; }
     bool operator != (const Position& other){ return other.x != x || other.y != y; }
-    Position operator + (const Position& other){ return *this += other; }
+    Position operator + (const Position& other){ return {this->x + other.x, this->y + other.y}; }
     Position& operator += (const Position& other){ this->x += other.x; this->y += other.y; return *this; }
-    Position operator - (const Position& other){ return *this -= other; }
+    Position operator - (const Position& other){ return {this->x - other.x, this->y - other.y}; }
     Position& operator -= (const Position& other){ this->x -= other.x; this->y -= other.y; return *this; }
 };
 

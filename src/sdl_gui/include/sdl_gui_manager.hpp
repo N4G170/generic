@@ -7,10 +7,14 @@
 #include "sdl_gui_label.hpp"
 #include "sdl_gui_layout.hpp"
 #include "sdl_gui_progress_bar.hpp"
-#include "sdl_gui_slider.hpp"
+#include "sdl_gui_hslider.hpp"
+#include "sdl_gui_vslider.hpp"
+#include "sdl_gui_vscrollbar.hpp"
 #include "sdl_gui_textbox.hpp"
 #include "sdl_gui_tooltip.hpp"
+#include "sdl_gui_scroll_box.hpp"
 #include "sdl_gui_camera.hpp"
+
 #include <memory>
 
 namespace sdl_gui
@@ -98,7 +102,7 @@ class GuiManager
 
         //</f>
 
-        //<f>
+        //<f> Camera
         Camera* GuiCamera() { return m_main_camera_ptr.get(); }
         //</f>
     private:

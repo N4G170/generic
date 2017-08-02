@@ -8,11 +8,12 @@ namespace sdl_gui
 
 CheckBox::CheckBox(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) :
     BaseButton{main_pointers, position, size},
-    m_is_checked{false}, m_check_mark_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)}, m_value{}
+    m_check_mark_image{main_pointers, position, size}, m_is_checked{false}, m_value{}
 {
     AddGuiCollider({0,0}, Size(), &m_transform);
 
-    m_check_mark_texture.ColourModulation(Colour::Black);
+    m_check_mark_image.Parent(this);
+    ConfigAsMultiple();
 
     //the other needed callbacks are set by the parent BaseButton
     m_mouse_interaction.MouseButtonCallback(SDL_BUTTON_LEFT, InputKeyCallbackType::CLICK, std::bind(&CheckBox::MouseClick, this));
@@ -23,17 +24,16 @@ CheckBox::~CheckBox() noexcept
 
 }
 
-CheckBox::CheckBox(const CheckBox& other) : BaseButton{other}, m_is_checked{other.m_is_checked},
-m_check_mark_texture{other.m_check_mark_texture}, m_value{other.m_value}
+CheckBox::CheckBox(const CheckBox& other) : BaseButton{other}, m_check_mark_image{other.m_check_mark_image},
+    m_is_checked{other.m_is_checked}, m_value{other.m_value}
 {
 
 }
 
-CheckBox::CheckBox(CheckBox&& other) noexcept : BaseButton{other}
+CheckBox::CheckBox(CheckBox&& other) noexcept : BaseButton{std::move(other)}, m_check_mark_image{std::move(other.m_check_mark_image)},
+    m_is_checked{std::move(other.m_is_checked)}, m_value{std::move(other.m_value)}
 {
-    m_is_checked = std::move(other.m_is_checked);
-    m_check_mark_texture = std::move(other.m_check_mark_texture);
-    m_value= std::move(other.m_value);
+
 }
 
 CheckBox& CheckBox::operator=(const CheckBox& other)
@@ -49,9 +49,12 @@ CheckBox& CheckBox::operator=(const CheckBox& other)
 
 CheckBox& CheckBox::operator=(CheckBox&& other) noexcept
 {
-    this->m_is_checked = std::move(other.m_is_checked);
-    this->m_check_mark_texture = std::move(other.m_check_mark_texture);
-    this->m_value = std::move(other.m_value);
+    if(this != &other)
+    {
+        this->m_check_mark_image = std::move(other.m_check_mark_image);
+        this->m_is_checked = std::move(other.m_is_checked);
+        this->m_value = std::move(other.m_value);
+    }
 
     return *this;
 }
@@ -101,8 +104,34 @@ void CheckBox::Render(float delta_time, Camera* camera)
         dst.h = check_h;
 
         if(m_is_checked)
-            m_check_mark_texture.Render(nullptr, &dst);
+            m_check_mark_image.Render(delta_time, camera);
     }
+}
+//</f>
+
+//<f> Checkbox type
+void CheckBox::ConfigAsMultiple()
+{
+    float size_ratio{75/100.f};
+    TransitionType(sdl_gui::ButtonTransitionType::COLOUR);
+    TransitionColourPtr()->ChangeBaseTexture(c_img_white_dot);
+
+    m_check_mark_image.ChangeTexture(c_img_white_dot);
+    m_check_mark_image.ColourModulation(Colour::Black);
+    m_check_mark_image.Size( {Size().w*size_ratio, Size().h*size_ratio} );
+    m_check_mark_image.AlignWithParentPoint(sdl_gui::AnchorType::MIDDLE_CENTRE);
+}
+
+void CheckBox::ConfigAsRadio()
+{
+    float size_ratio{(75/100.f)};
+    TransitionType(sdl_gui::ButtonTransitionType::COLOUR);
+    TransitionColourPtr()->ChangeBaseTexture(c_img_white_circle);
+
+    m_check_mark_image.ChangeTexture(c_img_white_circle);
+    m_check_mark_image.ColourModulation(Colour::Black);
+    m_check_mark_image.Size( {Size().w*size_ratio, Size().h*size_ratio} );
+    m_check_mark_image.AlignWithParentPoint(sdl_gui::AnchorType::MIDDLE_CENTRE);
 }
 //</f>
 

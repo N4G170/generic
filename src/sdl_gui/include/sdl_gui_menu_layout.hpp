@@ -2,77 +2,63 @@
 #include "sdl_gui_texture.hpp"
 #include "sdl_gui_enums.hpp"
 #include "sdl_gui_utils.hpp"
-#include <unordered_map>
+#include "sdl_gui_menu_item.hpp"
+#include <memory>
+#include <vector>
 
 namespace sdl_gui
 {
-#ifndef SDL_GUI_LAYOUT_HPP
-#define SDL_GUI_LAYOUT_HPP
+#ifndef SDL_GUI_MENU_LAYOUT_HPP
+#define SDL_GUI_MENU_LAYOUT_HPP
 
-struct LayoutConfig
+struct MenuLayoutConfig
 {
-    LayoutWrapMode wrap_mode;
-    Dimensions element_size;
-    int num_of_lines;
-    int num_of_columns;
     int vertical_element_spacing;
     int horizontal_element_spacing;
     int top_margin;
     int left_margin;
     int bottom_margin;
     int right_margin;
-    std::string ToString()
-    {
-        return sdl_gui::ToString(element_size)+" "+std::to_string(num_of_lines)+" "+std::to_string(num_of_columns);
-    }
 };
 
-class Layout: public GuiElement
+class MenuLayout: public GuiElement
 {
     public:
         /* Default constructor */
-        Layout(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
+        MenuLayout(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
-        virtual ~Layout() noexcept;
+        virtual ~MenuLayout() noexcept;
 
         /* Copy constructor */
-        Layout(const Layout& other);
+        MenuLayout(const MenuLayout& other);
         /* Move constructor */
-        Layout(Layout&& other) noexcept;
+        MenuLayout(MenuLayout&& other) noexcept;
 
         /* Copy operator */
-        Layout& operator= (const Layout& other);
+        MenuLayout& operator= (const MenuLayout& other);
         /* Move operator */
-        Layout& operator= (Layout&& other) noexcept;
+        MenuLayout& operator= (MenuLayout&& other) noexcept;
 
         //<f> Overrides GuiElement
-        // void Input(const SDL_Event& event) override;
+        void Input(const SDL_Event& event) override;
 
         // void FixedLogic(float fixed_delta_time) override;
-        // void Logic(float delta_time) override;
+        void Logic(float delta_time) override;
 
         void Render(float delta_time) override;
         void Render(float delta_time, Camera* camera) override;
         //</f>
 
         //<f> Contents management
-        /**
-         * \brief Add a new element to this container.
-         */
-        void AddElement(GuiElement* element);
+        void CreateItem(const std::string& text);
 
-        void RemoveElement(GuiElement* element);
+        /**
+         * \brief Add a new item to this container.(Container takes ownership of it)
+         */
+        void AddElement(MenuItem* item);
         //</f>
 
-        //<f> Layout Config
-        Dimensions ElementSize() const { return m_layout_config.element_size; }
-        void ElementSize(const Dimensions& element_size) { m_layout_config.element_size = element_size; }
-
-        int NumOfLines() const { return m_layout_config.num_of_lines; }
-        void NumOfLines(int lines) { m_layout_config.num_of_lines = lines; }
-        int NumOfColumns() const { return m_layout_config.num_of_columns; }
-        void NumOfColumns(int columns) { m_layout_config.num_of_columns = columns; }
-
+        //<f> MenuLayout Config
         void Margins(int top, int left, int bottom, int right);
         int MarginTop() const { return m_layout_config.top_margin; }
         int MarginLeft() const { return m_layout_config.left_margin; }
@@ -85,17 +71,16 @@ class Layout: public GuiElement
         int SpacingHorizontal() const { return m_layout_config.horizontal_element_spacing; }
         void SpacingHorizontal(int spacing) { m_layout_config.horizontal_element_spacing = spacing; }
 
-        LayoutConfig Config() const { return m_layout_config; }
-        void Config(const LayoutConfig& config){ m_layout_config = config; }
+        MenuLayoutConfig Config() const { return m_layout_config; }
+        void Config(const MenuLayoutConfig& config){ m_layout_config = config; }
 
         //</f>
 
     private:
         //<f> Elements
-        std::vector<GuiElement*> m_elements;
+        std::vector<std::unique_ptr<MenuItem>> m_elements;
 
-        LayoutConfig m_layout_config;
-
+        MenuLayoutConfig m_layout_config;
 
         void UpdateElementsPositions();
 
@@ -104,5 +89,5 @@ class Layout: public GuiElement
 
 };
 
-#endif //SDL_GUI_LAYOUT_HPP
+#endif //SDL_GUI_MENU_LAYOUT_HPP
 }//namespace

@@ -14,6 +14,7 @@ Font::Font(SDL_Renderer* renderer_ptr, const std::string& font_path, int font_si
     m_max_glyph_w{0}, m_line_spacing{5}
 {
     m_font_ptr.reset(TTF_OpenFont(m_source_path.data(), font_size));
+    m_font_height = TTF_FontHeight(m_font_ptr.get());
     m_font_texture = nullptr;
     CreateFontGlyphSheet();
 }
@@ -29,6 +30,7 @@ Font::Font(Font&& other) noexcept
     m_source_path = std::move(other.m_source_path);
     m_font_size = std::move(other.m_font_size);
     m_max_glyph_w = std::move(other.m_max_glyph_w);
+    m_font_height = std::move(other.m_font_height);
     m_line_spacing = std::move(other.m_line_spacing);
     m_font_texture = std::move(other.m_font_texture);
 }
@@ -41,6 +43,7 @@ Font& Font::operator=(Font&& other) noexcept
         m_source_path = std::move(other.m_source_path);
         m_font_size = std::move(other.m_font_size);
         m_max_glyph_w = std::move(other.m_max_glyph_w);
+        m_font_height = std::move(other.m_font_height);
         m_line_spacing = std::move(other.m_line_spacing);
         m_font_texture = std::move(other.m_font_texture);
     }
@@ -81,8 +84,8 @@ bool Font::StringTexture(const std::string& text, int origin_x, int origin_y, SD
     {
         if(text_codes[i] == c_new_line_code)//new line \n
         {
-            x = 0;
-            y += prev_h + m_line_spacing;
+            x = 0;//reset "caret"
+            y += prev_h + m_line_spacing;//new_line
             continue;
         }
         else if(text_codes[i] == c_horizontal_tab_code)// \t
@@ -92,8 +95,8 @@ bool Font::StringTexture(const std::string& text, int origin_x, int origin_y, SD
             //check for new line
             if(x > line_length)
             {
-                x = 0;
-                y += prev_h + m_line_spacing;
+                x = 0;//reset "caret"
+                y += prev_h + m_line_spacing;//new_line
             }
             continue;
         }
@@ -280,54 +283,114 @@ void Font::RenderGlyph(SDL_Surface*& surface, int& w, int& char_unicode)
 
 void Font::CalculateTextTextureSize(const std::string& text, int* w, int* h, int line_length)
 {
-    int text_w{0}, text_h{0};
+    //print text
+    int max_w{0};//store max x achieved
+    int max_h{0};//store max y achieved
+    int line_w{0};//width of current line
+    int line_h{m_font_height};//current total height, starts with the height of one line
 
-    std::vector<int> text_codes{ DecodeStringUTF8(text) };
+    bool bold{false};//use bold font
+    bool italic{false};//use italic font
 
-    //remove any text tag as they should not count towards text length
-    for(auto i{0}; i < text_codes.size(); ++i)
+    std::vector<int> text_codes{ DecodeStringUTF8(text) };//decode to int
+    int prev_glyph_w{0};//used to perform tab with \t (will, probably, always store the same value during the loop)
+
+    //run trough all codes
+    for(int i{0}; i < text_codes.size(); ++i)
     {
+        if(text_codes[i] == c_new_line_code)//new line \n
+        {
+            line_w = 0;//reset width
+            line_h += m_font_height + m_line_spacing;//new line
+            continue;
+        }
+        else if(text_codes[i] == c_horizontal_tab_code)// \t
+        {
+            line_w += prev_glyph_w * 4;//four time the space
+
+            //check for new line
+            if(line_w > line_length)
+            {
+                line_w = 0;//reset width
+                line_h += m_font_height + m_line_spacing;//new line
+            }
+            continue;
+        }
+
         if(CheckTextTag(true, text_codes, i, i+2, 1))//check if open tag
         {
-            text_codes[i] = text_codes[i+1] = text_codes[i+2] = -1;//invalidate entry
             i+=3;
+            bold = true;
         }
         else if(CheckTextTag(false, text_codes, i, i+3, 1))//close
         {
-            text_codes[i] = text_codes[i+1] = text_codes[i+2] = text_codes[i+3] = -1;//invalidate entry
             i+=4;
+            bold = false;
         }
         else if(CheckTextTag(true, text_codes, i, i+2, 2))//check if open tag italic
         {
-            text_codes[i] = text_codes[i+1] = text_codes[i+2] = -1;//invalidate entry
             i+=3;
+            italic = true;
         }
         else if(CheckTextTag(false, text_codes, i, i+3, 2))//close
         {
-            text_codes[i] = text_codes[i+1] = text_codes[i+2] = text_codes[i+3] = -1;//invalidate entry
             i+=4;
+            italic = false;
         }
-    }
 
-    //remove invalid codes, -1 from previous loop
-    text_codes.erase(std::remove_if( std::begin(text_codes), std::end(text_codes), [](int code)->bool{ return code == -1;}), std::end(text_codes));
+        //get stats from correct font style
+        SDL_Rect glyph_rect;
+        if(italic && bold)
+            glyph_rect = m_glyphs_positions[text_codes[i]].italic_bold;
+        else if(bold)
+            glyph_rect = m_glyphs_positions[text_codes[i]].bold;
+        else if(italic)
+            glyph_rect = m_glyphs_positions[text_codes[i]].italic;
+        else
+            glyph_rect = m_glyphs_positions[text_codes[i]].normal;
 
-    std::vector<Uint16> text_unicode;
-    for(int code : text_codes)//convert int to Uint16 so we can use TTF_SizeUNICODE
-        text_unicode.push_back(static_cast<Uint16>(code));
+        //add current glyph width to line width
+        line_w += glyph_rect.w;
 
-    TTF_SizeUNICODE(m_font_ptr.get(), text_unicode.data(), &text_w, &text_h);
+        //Check we we need a new line because of width limit reached
+        if(line_length > 0)
+        {
+            if(text_codes[i] == ' ')//' '
+            {
+                //check if next word fits
+                int word_length{0};
+                int char_index{i + 1};
+                while(char_index < text_codes.size() && text_codes[char_index] > ' ')//space is the first valid char
+                {
+                    word_length += glyph_rect.w;
+                    ++char_index;
+                }
 
-    if(line_length > 0 && line_length > m_max_glyph_w)//allow line break if we have space for, at least, one glyph per line
-    {
-        *w = line_length;
-        *h = (text_h + m_line_spacing ) * std::max(text_w / line_length, 1);//will, always, have "1 unit" of height
-    }
-    else
-    {
-        *w = text_w;
-        *h = text_h;
-    }
+                if(line_w + word_length > line_length)//new line
+                {
+                    line_w = 0;
+                    line_h += glyph_rect.h + m_line_spacing;
+                }
+            }
+            else if(line_w > line_length)//new line
+            {
+                line_w = 0;
+                line_h += glyph_rect.h + m_line_spacing;
+            }
+        }
+        //update prev vars
+        prev_glyph_w = glyph_rect.w;
+
+        //update max values
+        if(line_w > max_w)
+            max_w = line_w;
+        if(line_h > max_h)
+            max_h = line_h;
+    }//for all codes
+
+    //return max values using the pointers
+    *w = max_w;
+    *h = max_h;
 }
 
 bool Font::CheckTextTag(bool is_open_tag, const std::vector<int>& letters, int start_index, int end_index, int type)

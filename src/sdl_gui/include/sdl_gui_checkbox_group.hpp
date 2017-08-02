@@ -39,11 +39,15 @@ class CheckBoxGroup : public GuiElement
         //</f>
 
         //<f> Virtual Methods
-        virtual int AddCheckBox(CheckBox* checkbox);
+        /**
+         * \brief The group will not own the checkbox
+         */
+        virtual void AddCheckBox(CheckBox* checkbox);
         //</f>
 
         //<f> Getters/Setters
-
+        CheckBoxGroupType GroupType() const { return m_group_type; }
+        void GroupType(CheckBoxGroupType type);
         //</f>
 
         //<f> Callbacks
@@ -54,11 +58,11 @@ class CheckBoxGroup : public GuiElement
         // vars and stuff
         CheckBoxGroupType m_group_type;
 
-        std::map<int, std::unique_ptr<CheckBox>> m_checkboxes;
+        std::unordered_map<UID, CheckBox*> m_checkboxes;
 
         std::vector<CheckBox*> m_selected_values;
 
-        void ChildValueChanged(CheckBox* changed_checkbox);
+        void CheckBoxChanged(CheckBox* changed_checkbox);
 };
 
 #endif //SDL_GUI_CHECKBOX_GROUP_HPP

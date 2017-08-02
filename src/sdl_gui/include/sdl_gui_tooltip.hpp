@@ -49,7 +49,7 @@ class Tooltip: public GuiElement
         void TooltipText(const std::string&);
         std::string TooltipText() const { return m_text; }
 
-        void ChangeCollider(const Collider& collider){ m_colliders[0] = collider; }
+        // void ChangeCollider(const Collider& collider){ m_colliders[0] = collider; }
         //</f>
 
     protected:

@@ -71,25 +71,40 @@ class GuiElement
         //</f>
 
         //<f> Position, Size & Transform interface
+        Position GlobalPositionIgnoreViewport() const { return m_transform.GlobalPositionIgnoreViewport(); }
         Position GlobalPosition() const { return m_transform.GlobalPosition(); }
         void GlobalPosition(const Position& new_global_position) { m_transform.GlobalPosition(new_global_position); }
         Position LocalPosition() const { return m_transform.LocalPosition(); }
         void LocalPosition(const Position& new_local_position) { m_transform.LocalPosition(new_local_position); }
 
         void ParentViewport(GuiTransform* parent_viewport) { m_transform.ParentViewport(parent_viewport); }
-        bool ParentViewport() const { return m_transform.ParentViewport(); }
+        GuiTransform* ParentViewport() const { return m_transform.ParentViewport(); }
 
         void Size(const Dimensions& new_size) { m_size = new_size; }
         Dimensions Size() const { return m_size; }
 
-        void CentreInParent();
+        SDL_Rect Bounds();
+
+        /**
+         * \brief Align this element specific point to the same point in the parent.
+         * \n Ex: top-left child to top-left of parent, ot middle-centre in child to middle-centre in parent
+         * @param point_type Point to align with
+         * \param offset Offset (x,y) for the element in relation of the point. Default 0 so points match
+         */
+        void AlignWithParentPoint(AnchorType point_type, Position offset = {0,0});
         //</f>
 
         //<f> Interaction & Colliders
         /* Add Box collider */
         void AddGuiCollider(const Position& local_position, const Dimensions& size, GuiTransform* owner_transform);
         /* Add Circle collider */
-        void AddGuiCollider(const Position& local_position, int circle_radius, GuiTransform* owner_transform);
+        void AddGuiCollider(const Position& local_position, float circle_radius, GuiTransform* owner_transform);
+
+        Collider* GetColliderPtr() const { return m_collider.get(); }
+        // Collider* GetColliderPtr(int index) const { return m_colliders[index].get(); }
+
+        virtual void Focus(){ m_focused = true; }
+        virtual void UnFocus(){ m_focused = false; }
         //</f>
 
         //<f> Parent & Children
@@ -126,7 +141,8 @@ class GuiElement
         //</f>
 
         //<f> Interaction
-        std::vector<Collider> m_colliders;
+        // std::vector<std::unique_ptr<Collider>> m_colliders;
+        std::unique_ptr<Collider> m_collider;
         bool m_active;
         bool m_focused;
         //</f>
@@ -136,10 +152,12 @@ class GuiElement
         std::unordered_map<UID, GuiElement*> m_children;
 
         /**
-         * \brief Take ownership of the element
+         * \brief Take ownership of the element. DO NOT CALL THIS METHOD
          */
         void AddChild(GuiElement* element);
-
+        /**
+         *  \brief DO NOT CALL THIS METHOD
+         */
         void RemoveChild(UID uid);
         //</f>
 };

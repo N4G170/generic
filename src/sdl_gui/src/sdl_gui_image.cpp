@@ -1,13 +1,15 @@
 #include "sdl_gui_image.hpp"
 #include "sdl_gui_log.hpp"
 #include "sdl_gui_utils.hpp"
+#include "sdl_gui_constants.hpp"
 #include <utility>
 
 namespace sdl_gui
 {
 
 //<f> Constructors & operator=
-Image::Image(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) : GuiElement{main_pointers, position, size} {}
+Image::Image(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) : GuiElement{main_pointers, position, size},
+    m_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)}{}
 
 Image::~Image() noexcept {}
 

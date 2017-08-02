@@ -14,10 +14,11 @@ const int c_horizontal_tab_code{int('\t')};
 
 //<f> Default File Paths
 
-const std::string c_img_white_dot{"data/img/white_dot.png"};
-const std::string c_button_base{"data/img/button_base.png"};
+const std::string c_img_white_dot{"data/sdl_gui/img/white_dot.png"};
+const std::string c_img_white_circle{"data/sdl_gui/img/white_circle.png"};
+const std::string c_button_base{"data/sdl_gui/img/button_base.png"};
 
-const std::string c_default_font_path{"data/font/DejaVuSansMono.ttf"};
+const std::string c_default_font_path{"data/sdl_gui/font/DejaVuSansMono.ttf"};
 
 //</f>
 

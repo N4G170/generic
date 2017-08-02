@@ -50,9 +50,7 @@ class Image : public GuiElement
 
         //<f> Colour Modulation
         SDL_Colour ColourModulation() const { return m_texture.ColourModulation(); }
-        /**
-         * \brief This functions will ignore the alpha field for that use \see AlphaModulation(int alpha)
-         */
+
         void ColourModulation(const SDL_Colour& colour){ m_texture.ColourModulation(colour); }
 
         int AlphaModulation() const { return m_texture.AlphaModulation(); }

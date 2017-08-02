@@ -41,6 +41,16 @@ GuiTransform& GuiTransform::operator=(GuiTransform&& other) noexcept
 //</f>
 
 //<f> Getters/Setters
+Position GuiTransform::GlobalPositionIgnoreViewport() const
+{
+    if(m_owner->Parent() != nullptr)
+    {
+        return m_owner->Parent()->GlobalPositionIgnoreViewport() + m_local_position;
+    }
+    else
+        return m_local_position;
+}
+
 Position GuiTransform::GlobalPosition() const
 {
     if(m_owner->Parent() != nullptr)
@@ -62,7 +72,8 @@ void GuiTransform::GlobalPosition(const Position& new_global_position)
 {
     if(m_owner->Parent() != nullptr)//ajust because of parent
     {
-        m_local_position = m_owner->Parent()->GlobalPosition() - new_global_position;
+        m_local_position = new_global_position;
+        m_local_position -=  m_owner->Parent()->GlobalPosition();//ajust to parent position
     }
     else
     {

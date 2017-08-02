@@ -38,14 +38,14 @@ class BaseButton : public GuiElement
         //</f>
 
         //<f> Overrides GUIElement
-        virtual void Input(const SDL_Event& event);
-        virtual void ClearInput();
+        void Input(const SDL_Event& event) override;
+        void ClearInput() override;
 
         // virtual void FixedLogic(float fixed_delta_time);
-        virtual void Logic(float delta_time);
+        void Logic(float delta_time) override;
 
-        virtual void Render(float delta_time);
-        virtual void Render(float delta_time, Camera* camera);
+        void Render(float delta_time) override;
+        void Render(float delta_time, Camera* camera) override;
         //</f>
 
         //<f> Methods

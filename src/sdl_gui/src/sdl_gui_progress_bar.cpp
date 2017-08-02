@@ -13,28 +13,19 @@ ProgressBar::ProgressBar(GuiMainPointers main_pointers, const Position& position
     m_bar_direction{ProgressBarDirection::RIGHT}, m_min_value{0}, m_max_value{100}, m_value{0}
 {
     m_bg_texture.ColourModulation({0,0,0,255});
-
-
 }
 
-ProgressBar::~ProgressBar() noexcept
-{
-
-}
+ProgressBar::~ProgressBar() noexcept {}
 
 ProgressBar::ProgressBar(const ProgressBar& other) : GuiElement{other},
     m_bg_texture{other.m_bg_texture}, m_bar_texture{other.m_bar_texture},
-    m_bar_direction{other.m_bar_direction}, m_min_value{other.m_min_value}, m_max_value{other.m_max_value}, m_value{other.m_value}
-{
-
-}
+    m_bar_direction{other.m_bar_direction}, m_min_value{other.m_min_value}, m_max_value{other.m_max_value}, m_value{other.m_value},
+    m_value_changed_callback{other.m_value_changed_callback} {}
 
 ProgressBar::ProgressBar(ProgressBar&& other) noexcept : GuiElement{other},
     m_bg_texture{std::move(other.m_bg_texture)}, m_bar_texture{std::move(other.m_bar_texture)},
-    m_bar_direction{std::move(other.m_bar_direction)}, m_min_value{std::move(other.m_min_value)}, m_max_value{std::move(other.m_max_value)}, m_value{std::move(other.m_value)}
-{
-
-}
+    m_bar_direction{std::move(other.m_bar_direction)}, m_min_value{std::move(other.m_min_value)}, m_max_value{std::move(other.m_max_value)}, m_value{std::move(other.m_value)},
+    m_value_changed_callback{std::move(other.m_value_changed_callback)} {}
 
 ProgressBar& ProgressBar::operator=(const ProgressBar& other)
 {
@@ -58,6 +49,7 @@ ProgressBar& ProgressBar::operator=(ProgressBar&& other) noexcept
         m_min_value = std::move(other.m_min_value);
         m_max_value = std::move(other.m_max_value);
         m_value = std::move(other.m_value);
+        m_value_changed_callback = std::move(other.m_value_changed_callback);
     }
     return *this;
 }

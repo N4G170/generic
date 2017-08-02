@@ -82,7 +82,7 @@ void BaseButton::Input(const SDL_Event& event)
     if( !m_active )
     return;
 
-    m_mouse_interaction.Input(event, m_colliders);
+    m_mouse_interaction.Input(event, m_collider.get());
 }
 
 void BaseButton::ClearInput()
@@ -99,7 +99,9 @@ void BaseButton::Logic(float delta_time)
         m_mouse_interaction.Logic(delta_time);
     }
     else
+    {
         ButtonTransitionCallback(ButtonState::INACTIVE);
+    }
 }
 
 void BaseButton::Render(float delta_time)
@@ -127,8 +129,6 @@ void BaseButton::Render(float delta_time, Camera* camera)
     }
 }
 //</f>
-
-
 
 //<f> Getters/Setters
 void BaseButton::TransitionType(ButtonTransitionType type)

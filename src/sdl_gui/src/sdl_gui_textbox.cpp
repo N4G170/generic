@@ -9,16 +9,26 @@ namespace sdl_gui
 
 //<f> Constructors & operator=
 Textbox::Textbox(GuiMainPointers main_pointers, const Position& position, const Dimensions& size) :
-    GuiElement{main_pointers, position, size}, m_bg_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)},
-    m_text_label{main_pointers, position, size}
+    GuiElement{main_pointers, position, size}, m_bg_image{main_pointers, position, size},
+    m_text_label{main_pointers, position, size}, m_caret_label{main_pointers, position, size}, m_label_to_render{&m_text_label}, m_text{""}, m_default_text{"<i>Click to edit</i>"},
+    m_blink_time_limit{0.5}, m_blink_time{0}
 {
     AddGuiCollider({0,0}, Size(), &m_transform);
 
-    m_edit_field_rect = RectFromStructs(position, size);
+    m_viewport_rect = RenderRect();
+    m_bg_image.Parent(this);
+    m_bg_image.TransformPtr()->ParentViewport(&m_transform);
+    m_bg_image.LocalPosition({0,0});
+    // m_viewport_rect = RectFromStructs(position, size);
     // m_text_label.RenderBorder(true);
     m_text_label.Parent(this);
     m_text_label.TransformPtr()->ParentViewport(&m_transform);
-    CentreLabel();
+    m_text_label.AlignWithParentPoint(sdl_gui::AnchorType::MIDDLE_LEFT);
+    m_text_label.Text(m_default_text);
+
+    m_caret_label.Text("|");
+
+    m_mouse_interaction.MouseButtonCallback(SDL_BUTTON_LEFT, sdl_gui::InputKeyCallbackType::CLICK, std::bind(&Textbox::Focus,this));
 }
 
 Textbox::~Textbox() noexcept
@@ -26,12 +36,15 @@ Textbox::~Textbox() noexcept
 
 }
 
-Textbox::Textbox(const Textbox& other) : GuiElement{other}, m_bg_texture{other.m_bg_texture}, m_text_label{other.m_text_label}
+Textbox::Textbox(const Textbox& other) : GuiElement{other}, m_bg_image{other.m_bg_image}, m_viewport_rect{other.m_viewport_rect}, m_text_label{other.m_text_label},
+    m_caret_label{other.m_caret_label}, m_label_to_render{other.m_label_to_render}
 {
 
 }
 
-Textbox::Textbox(Textbox&& other) noexcept : GuiElement{other}, m_bg_texture{std::move(other.m_bg_texture)}, m_text_label{std::move(other.m_text_label)}
+Textbox::Textbox(Textbox&& other) noexcept : GuiElement{std::move(other)}, m_bg_image{std::move(other.m_bg_image)}, m_viewport_rect{std::move(other.m_viewport_rect)},
+    m_text_label{std::move(other.m_text_label)}, m_caret_label{std::move(other.m_caret_label)},
+    m_label_to_render{std::move(other.m_label_to_render)}
 {
 
 }
@@ -43,100 +56,123 @@ Textbox& Textbox::operator=(const Textbox& other)
         Textbox tmp(other);
         *this = std::move(tmp);
     }
-
     return *this;
 }
 
 Textbox& Textbox::operator=(Textbox&& other) noexcept
 {
+    if(this != &other)
+    {
+        GuiElement::operator=(std::move(other));
+        m_bg_image = std::move(other.m_bg_image);
+        m_viewport_rect = std::move(other.m_viewport_rect);
+        m_text_label = std::move(other.m_text_label);
+        m_caret_label = std::move(other.m_caret_label);
+        m_label_to_render = std::move(other.m_label_to_render);
+    }
     return *this;
 }
 //</f>
 
 //<f> Overrides GUIElement
-// void Textbox::Input(const SDL_Event& event)
-// {
-//     if( !m_active )
-//         return;
-//
-//     bool status{ MouseInsideCollider(event.motion.x, event.motion.y) };
-//
-//
-//     if(status)//mouse inside button, we can do stuff
-//     {
-//         //enter exit button
-//         if(!(m_mouse_flags & MouseFlags::MOUSE_HOVER) && status)//we enter the button
-//         m_mouse_flags |= MouseFlags::MOUSE_ENTER;//add
-//         if((m_mouse_flags & MouseFlags::MOUSE_HOVER) && !status)//we exit the button
-//         m_mouse_flags |= MouseFlags::MOUSE_EXIT;//add
-//
-//         if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT)//valid btn down
-//         {
-//             m_mouse_flags |= MouseFlags::MOUSE_DOWN;
-//             m_mouse_flags |= MouseFlags::MOUSE_HOLD_DOWN;
-//         }
-//         else if(event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT)//valid btn up
-//         {
-//             m_mouse_flags |= MouseFlags::MOUSE_UP;
-//             m_mouse_flags &= ~MouseFlags::MOUSE_HOLD_DOWN;
-//         }
-//
-//         //update hover flag
-//         m_mouse_flags |= MouseFlags::MOUSE_HOVER;//add
-//     }
-//     else//clear flags
-//     {
-//         m_mouse_flags = MouseFlags::NONE;
-//     }
-// }
+void Textbox::Input(const SDL_Event& event)
+{
+    if( !m_active )
+        return;
 
-// void Textbox::Logic(float fixed_delta_time)
-// {
-//     if(m_active)
-//     {
-//         if(m_mouse_callbacks[MouseCallbackType::ACTIVE])
-//             m_mouse_callbacks[MouseCallbackType::ACTIVE]();
-//
-//         m_valid_click_timer += fixed_delta_time;
-//
-//         if(m_mouse_flags & MouseFlags::MOUSE_HOVER)
-//         {
-//             if(m_mouse_callbacks[MouseCallbackType::HOVER])
-//                 m_mouse_callbacks[MouseCallbackType::HOVER]();
-//         }
-//         if(m_mouse_flags & MouseFlags::MOUSE_DOWN)
-//         {
-//             m_valid_click_timer = 0;//start click timer
-//
-//             m_mouse_flags &= ~MouseFlags::MOUSE_DOWN;
-//             if(m_mouse_callbacks[MouseCallbackType::DOWN])
-//                 m_mouse_callbacks[MouseCallbackType::DOWN]();
-//         }
-//         else if(m_mouse_flags & MouseFlags::MOUSE_UP)
-//         {
-//             m_mouse_flags &= ~MouseFlags::MOUSE_UP;
-//             if(m_mouse_callbacks[MouseCallbackType::UP])
-//                 m_mouse_callbacks[MouseCallbackType::UP]();
-//
-//             if(m_valid_click_timer <= 0.25)
-//             {
-//                 if(m_mouse_callbacks[MouseCallbackType::CLICK])
-//                     m_mouse_callbacks[MouseCallbackType::CLICK]();
-//             }
-//         }
-//
-//         if(m_mouse_flags & MouseFlags::MOUSE_HOLD_DOWN)
-//         {
-//             if(m_mouse_callbacks[MouseCallbackType::HOLD])
-//                 m_mouse_callbacks[MouseCallbackType::HOLD]();
-//         }
-//     }
-//     else
-//     {
-//         if(m_mouse_callbacks[MouseCallbackType::INACTIVE])
-//             m_mouse_callbacks[MouseCallbackType::INACTIVE]();
-//     }
-// }
+    m_mouse_interaction.Input(event, m_collider.get());
+
+    //QUICK FIX
+    auto mouse_inside_collider = [](int mouse_x, int mouse_y, Collider* collider)->bool
+    {
+        if(collider != nullptr && collider->IsPointColliding(mouse_x, mouse_y))
+            return true;
+        return false;
+    };
+    int mouse_x{},mouse_y{};
+    SDL_GetMouseState(&mouse_x, &mouse_y);
+    if(event.button.type == SDL_MOUSEBUTTONUP &&  event.button.button == SDL_BUTTON_LEFT && !mouse_inside_collider(mouse_x, mouse_y, m_collider.get()))//outisde
+        UnFocus();
+    //END QUICK FIX
+
+    //text input
+    if(m_focused)
+    {
+        if(event.type == SDL_KEYDOWN)
+        {
+            if(event.key.keysym.sym == SDLK_BACKSPACE && !m_text.empty())
+            {
+                m_text_representation.pop_back();
+                m_text.pop_back();
+                m_text_label.Text(m_text_representation);
+            }
+        }
+        if(event.type == SDL_TEXTINPUT)
+        {
+            if(m_input_type == TextboxInputType::PASSWORD)
+            {
+                m_text_representation += '*';
+                m_text += event.text.text;
+            }
+            else if(m_input_type == TextboxInputType::INTEGER)
+            {
+                try//check if valid int
+                {
+                    std::stoi(event.text.text);
+                    m_text += event.text.text;
+                    m_text_representation += event.text.text;
+                }
+                catch(std::exception) {}
+            }
+            else
+            {
+                m_text_representation += event.text.text;
+                m_text += event.text.text;
+            }
+            m_text_label.Text(m_text_representation);
+        }
+    }
+}
+
+void Textbox::Logic(float delta_time)
+{
+    m_mouse_interaction.Logic(delta_time);
+
+    if(m_focused)
+    {
+        m_blink_time += delta_time;
+
+        if(m_blink_time >= m_blink_time_limit)
+        {
+            m_blink_time = 0;
+
+            m_caret_label.CanRender( !m_caret_label.CanRender() );
+        }
+
+        //reposition label if it is too big for textbox
+        if(m_text_label.Size().w + m_caret_label.Size().w > Size().w)//mode label left
+        {
+            Position position{Size().w - (m_text_label.Size().w + m_caret_label.Size().w), m_text_label.LocalPosition().y};
+            m_text_label.LocalPosition(position);
+        }
+        else if(m_text_label.LocalPosition().x < 0)//label moved left during edit
+        {
+            Position position{0, m_text_label.LocalPosition().y};
+            m_text_label.LocalPosition(position);
+        }
+
+        //calculate caret position
+        auto text_width{m_text_label.Size().w};
+        auto text_position{m_text_label.LocalPosition()};
+
+        m_caret_label.LocalPosition({text_position.x + text_width, text_position.y});
+    }
+    else
+    {
+        if(m_text.empty())
+            m_text_label.Text(m_default_text);
+    }
+}
 
 void Textbox::Render(float delta_time)
 {
@@ -156,38 +192,58 @@ void Textbox::Render(float delta_time, Camera* camera)
 
     if(camera->RectInsideCamera(dst))
     {
-        m_bg_texture.Render(nullptr, &dst);
+        //render thin border
+        if(m_focused)
+            SDL_SetRenderDrawColor(m_main_pointers.main_renderer_ptr, 0, 255, 0, 255);
+        else
+            SDL_SetRenderDrawColor(m_main_pointers.main_renderer_ptr, 255,0,0, 255);
 
-        m_edit_field_rect = {dst.x + 5, dst.y + 5, dst.w - 10, dst.h - 10};
-
+        SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &m_viewport_rect);
         //set viewport
-        SDL_RenderSetViewport(m_main_pointers.main_renderer_ptr, &m_edit_field_rect);
-        m_text_label.Render(delta_time);
+        SDL_RenderSetViewport(m_main_pointers.main_renderer_ptr, &m_viewport_rect);
+        m_bg_image.Render(delta_time, camera);
+        m_text_label.Render(delta_time, camera);
+        m_caret_label.Render(delta_time, camera);
         SDL_RenderSetViewport(m_main_pointers.main_renderer_ptr, nullptr);
 
-        SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &m_edit_field_rect);
+        SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &m_viewport_rect);
     }
 
 }
 //</f>
 
-//<f> Private Methods
-void Textbox::CentreLabel()
+//<f> Virtual Methods
+void Textbox::Focus()
 {
-    // int border{10};//in pixels
+    m_focused = true;
+    SDL_StartTextInput();
+    m_blink_time = 0;
+    m_text_label.Text(m_text_representation);
 
-    Position position{m_text_label.TransformPtr()->LocalPosition()};
-    Dimensions dimensions{m_text_label.Size()};
-
-    // position.x = border;
-    position.y = m_edit_field_rect.h/2 - dimensions.h/2;
-    // position.y = m_transform.Size().h/2 - dimensions.h/2;
-    // m_text_label.LineLength( m_transform.Size().w - border * 2 );
-    // dimensions.h = m_transform.Size().h - border * 2;
-
-    m_text_label.TransformPtr()->LocalPosition(position);
-    // m_text_label.TransformPtr()->Size(dimensions);
+    if(m_text_label.Size().w + m_caret_label.Size().w > Size().w)//mode label left
+    {
+        Position position{Size().w - (m_text_label.Size().w + m_caret_label.Size().w), m_text_label.LocalPosition().y};
+        m_text_label.LocalPosition(position);
+    }
 }
+
+void Textbox::UnFocus()
+{
+    m_focused = false;
+    SDL_StopTextInput();
+    //hide caret
+    m_caret_label.CanRender(false);
+
+    if(m_text_label.LocalPosition().x < 0)//label moved left during edit
+    {
+        Position position{0, m_text_label.LocalPosition().y};
+        m_text_label.LocalPosition(position);
+    }
+}
+//</f>
+
+//<f> Private Methods
+
 //</f>
 
 }//namespace

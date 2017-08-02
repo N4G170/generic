@@ -69,6 +69,13 @@ class Vector2
         void Print() const { std::cout<<"("<< m_x<<", "<<m_y<<")\n"; };
         std::string ToString() const { return ("("+std::to_string(m_x)+", "+std::to_string(m_y)+")\n"); };
 
+        /**
+         * \brief lerp between two Vector2
+         * @param other         the other vector
+         * @param t             the ratio
+         * @param this_is_start If true this vector is the min else this vector is max
+         * \return  The value between min and max corresponding to the ratio t
+         */
         Vector2 Lerp(const Vector2<T>& other, const float& t, const bool& this_is_start = true);
 };
 

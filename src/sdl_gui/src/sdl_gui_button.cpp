@@ -90,7 +90,7 @@ void Button::CreateLabel(const std::string& text, const std::string& font_path, 
 void Button::CentreLabel()
 {
     if(m_label_ptr)
-        m_label_ptr->CentreInParent();
+        AlignWithParentPoint(sdl_gui::AnchorType::MIDDLE_CENTRE);
 }
 /* </ Virtual Methods > */
 

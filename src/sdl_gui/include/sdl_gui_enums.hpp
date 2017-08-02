@@ -35,7 +35,8 @@ enum class ButtonState
     INACTIVE,   ///< Button is inactive, cannot be interacted with
     ACTIVE,     ///< Button is active, can be interacted with
     OVER,       ///< Button has "something"(usually mouse) hovering it
-    PRESSED     ///< Button was pressed
+    PRESSED,    ///< Button was pressed
+    SELECTED    ///< Button "remains" pressed
 };
 
 /**
@@ -81,6 +82,13 @@ enum class InputKeyCallbackType
     UP,     ///< Mouse button up
 };
 
+enum class TextboxInputType
+{
+    ALPHANUMERIC,
+    INTEGER,
+    PASSWORD, ///< will show *****
+};
+
 // </f>
 
 //<f> Layout
@@ -99,8 +107,16 @@ enum class CheckBoxGroupType
 };
 //</f>
 
-//<f> ProgressBar
+//<f> ProgressBar & Sliders
 enum class ProgressBarDirection
+{
+    LEFT,   ///< Bar fills right->left
+    RIGHT,  ///< Bar fills left->right
+    UP,     ///< Bar fills bottom->up
+    DOWN    ///< Bar fills top->down
+};
+
+enum class SliderDirection
 {
     LEFT,   ///< Bar fills right->left
     RIGHT,  ///< Bar fills left->right

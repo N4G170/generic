@@ -49,7 +49,7 @@ class Label : public GuiElement
         //</f>
 
         //<f> Getters/Setters
-        std::string Text();
+        std::string Text() const { return m_text; }
         void Text(const std::string& text, const SDL_Colour& text_colour = {0,0,0,255});
 
         /**

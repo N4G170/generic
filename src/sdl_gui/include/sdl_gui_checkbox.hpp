@@ -1,5 +1,5 @@
 #include "sdl_gui_base_button.hpp"
-#include "sdl_gui_texture.hpp"
+#include "sdl_gui_image.hpp"
 #include <functional>
 
 namespace sdl_gui
@@ -41,6 +41,13 @@ class CheckBox: public BaseButton
 
         int Value() const { return m_value; }
         void Value(int new_value) { m_value = new_value; }
+
+        Image* CheckMarkImage() { return &m_check_mark_image; }
+        //</f>
+
+        //<f> Checkbox type
+        void ConfigAsMultiple();
+        void ConfigAsRadio();
         //</f>
 
         //<f> Callbacks
@@ -53,11 +60,8 @@ class CheckBox: public BaseButton
         //</f>
     private:
         // vars and stuff
+        Image m_check_mark_image;
         bool m_is_checked;
-        Texture m_check_mark_texture;
-
-        std::map<ButtonState, SDL_Colour> m_status_colours;
-
         int m_value;
 };
 

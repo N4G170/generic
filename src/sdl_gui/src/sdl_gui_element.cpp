@@ -1,12 +1,15 @@
 #include "sdl_gui_element.hpp"
 #include <utility>
 #include "sdl_gui_utils.hpp"
+#include "sdl_gui_box_collider.hpp"
+#include "sdl_gui_circle_collider.hpp"
+#include "sdl_gui_log.hpp"
 
 namespace sdl_gui
 {
 //<f> Constructors & operator=
 GuiElement::GuiElement(GuiMainPointers main_pointers, const Position& position, const Dimensions& size): m_uid{GenerateUID()}, m_transform{this}, m_size{size},
-    m_main_pointers{main_pointers}, m_render{true}, m_active{true}, m_focused{false}, m_parent{nullptr}
+    m_main_pointers{main_pointers}, m_render{true}, m_collider{nullptr}, m_active{true}, m_focused{false}, m_parent{nullptr}
 {
     m_transform.LocalPosition(position);
 }
@@ -16,11 +19,17 @@ GuiElement::~GuiElement() noexcept {}
 GuiElement::GuiElement(const GuiElement& other) : m_uid{GenerateUID()}, m_transform{other.m_transform},
     m_size{other.m_size}, m_main_pointers{other.m_main_pointers},
     m_render{other.m_render}, m_active{other.m_active}, m_focused{other.m_focused},
-    m_parent{other.m_parent}, m_children{other.m_children} {}
+    m_parent{other.m_parent}, m_children{other.m_children}
+{
+    if(other.m_collider)
+        m_collider.reset(other.m_collider.get()->Duplicate());
+    else
+        m_collider.reset();
+}
 
 GuiElement::GuiElement(GuiElement&& other) noexcept : m_uid{std::move(other.m_uid)}, m_transform{std::move(other.m_transform)},
     m_size{std::move(other.m_size)}, m_main_pointers{std::move(other.m_main_pointers)},
-    m_render{std::move(other.m_render)}, m_active{std::move(other.m_active)}, m_focused{std::move(other.m_focused)},
+    m_render{std::move(other.m_render)}, m_collider{std::move(other.m_collider)}, m_active{std::move(other.m_active)}, m_focused{std::move(other.m_focused)},
     m_parent{std::move(other.m_parent)}, m_children{std::move(other.m_children)} {}
 
 GuiElement& GuiElement::operator= (const GuiElement& other)
@@ -42,6 +51,7 @@ GuiElement& GuiElement::operator= (GuiElement&& other)
         this->m_size = std::move(other.m_size);
         this->m_main_pointers = std::move(other.m_main_pointers);
         this->m_render = std::move(other.m_render);
+        this->m_collider = std::move(other.m_collider);
         this->m_active = std::move(other.m_active);
         this->m_focused = std::move(other.m_focused);
         this->m_parent = std::move(other.m_parent);
@@ -75,16 +85,92 @@ SDL_Rect GuiElement::RenderRect()
 //</f>
 
 //<f> Position, Size & Transform interface
-void GuiElement::CentreInParent()
+void GuiElement::AlignWithParentPoint(AnchorType point_type, Position offset)
 {
     if(m_parent != nullptr)
     {
         auto parent_size{m_parent->Size()};
+        Position local_point{0,0};
 
-        //parent midpoint(local)
-        Position midpoint{ parent_size.w / 2, parent_size.h / 2};
-        this->LocalPosition({midpoint.x - Size().w / 2, midpoint.y - Size().h / 2});
+        switch(point_type)
+        {
+            case AnchorType::TOP_LEFT :
+                local_point = {0, 0};
+                this->LocalPosition({local_point.x + offset.x, local_point.y + offset.y});
+            break;
+
+            case AnchorType::TOP_CENTRE :
+                local_point = {parent_size.w / 2, 0};
+                this->LocalPosition({local_point.x - Size().w / 2 + offset.x, local_point.y + offset.y});
+            break;
+
+            case AnchorType::TOP_RIGHT :
+                local_point = {parent_size.w, 0};
+                this->LocalPosition({local_point.x - Size().w + offset.x, local_point.y + offset.y});
+            break;
+
+            case AnchorType::MIDDLE_LEFT :
+                local_point = {0, parent_size.h / 2};
+                this->LocalPosition({local_point.x + offset.x, local_point.y - Size().h / 2 + offset.y});
+            break;
+
+            case AnchorType::MIDDLE_CENTRE :
+                local_point = {parent_size.w / 2, parent_size.h / 2};
+                this->LocalPosition({local_point.x - Size().w / 2 + offset.x, local_point.y - Size().h / 2 + offset.y});
+            break;
+
+            case AnchorType::MIDDLE_RIGHT :
+                local_point = {parent_size.w, parent_size.h / 2};
+                this->LocalPosition({local_point.x - Size().w + offset.x, local_point.y - Size().h / 2 + offset.y});
+            break;
+
+            case AnchorType::BOTTOM_LEFT :
+                local_point = {0, parent_size.h};
+                this->LocalPosition({local_point.x + offset.x, local_point.y - Size().h + offset.y});
+            break;
+
+            case AnchorType::BOTTOM_CENTRE :
+                local_point = {parent_size.w / 2, parent_size.h};
+                this->LocalPosition({local_point.x - Size().w / 2 + offset.x, local_point.y - Size().h + offset.y});
+            break;
+
+            case AnchorType::BOTTOM_RIGHT :
+                local_point = {parent_size.w, parent_size.h};
+                this->LocalPosition({local_point.x - Size().w + offset.x, local_point.y - Size().h + offset.y});
+            break;
+        }
     }
+}
+
+SDL_Rect GuiElement::Bounds()
+{
+    if(m_children.empty())//our bounds = our size and position
+        return RenderRect();
+
+    auto min_x {static_cast<int>(GlobalPosition().x)};
+    auto max_x {min_x + static_cast<int>(Size().w)};
+    auto min_y {static_cast<int>(GlobalPosition().y)};
+    auto max_y {min_y + static_cast<int>(Size().h)};
+
+    for(auto& child : m_children)
+    {
+        auto bounds{child.second->Bounds()};
+        // LogLine(ToString(bounds));
+        if(bounds.x < min_x)
+            min_x = bounds.x;
+        if(bounds.x + bounds.w > max_x)
+            max_x = bounds.x + bounds.w;
+        if(bounds.y < min_y)
+            min_y = bounds.y;
+        if(bounds.y + bounds.h > max_y)
+            max_y = bounds.y + bounds.h;
+
+    }
+    // LogLine(std::to_string(max_x)+" - "+std::to_string(max_y));
+
+    //max_x - min_x = w
+    //max_y - min_y = h
+    return {min_x, min_y, max_x - min_x, max_y - min_y};
 }
 //</f>
 
@@ -92,12 +178,14 @@ void GuiElement::CentreInParent()
 /* Add Box collider */
 void GuiElement::AddGuiCollider(const Position& local_position, const Dimensions& size, GuiTransform* owner_transform)
 {
-    m_colliders.emplace_back(local_position, size, owner_transform);
+    m_collider.reset(new BoxCollider{local_position, size, owner_transform});
+    // m_colliders.emplace_back(std::unique_ptr<Collider>(new BoxCollider{local_position, size, owner_transform}));
 }
 /* Add Circle collider */
-void GuiElement::AddGuiCollider(const Position& local_position, int circle_radius, GuiTransform* owner_transform)
+void GuiElement::AddGuiCollider(const Position& local_position, float circle_radius, GuiTransform* owner_transform)
 {
-    m_colliders.emplace_back(local_position, circle_radius, owner_transform);
+    m_collider.reset(new CircleCollider{local_position, circle_radius, owner_transform});
+    // m_colliders.emplace_back(std::unique_ptr<Collider>(new CircleCollider{local_position, circle_radius, owner_transform}));
 }
 //</f>
 

@@ -1,40 +1,40 @@
 #include "sdl_gui_element.hpp"
-#include "sdl_gui_texture.hpp"
 #include "sdl_gui_enums.hpp"
+#include "sdl_gui_base_button.hpp"
 #include "sdl_gui_utils.hpp"
 #include <functional>
 
 namespace sdl_gui
 {
 
-#ifndef SDL_GUI_PROGRESS_BAR_HPP
-#define SDL_GUI_PROGRESS_BAR_HPP
+#ifndef SDL_GUI_HSLIDER_HPP
+#define SDL_GUI_HSLIDER_HPP
 
-class ProgressBar : public GuiElement
+class HSlider : public GuiElement
 {
     public:
         //<f> Constructors & operator=
         /* Default constructor */
-        ProgressBar(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
+        HSlider(GuiMainPointers main_pointers, const Position& position, const Dimensions& size);
         /* Default destructor */
-        virtual ~ProgressBar() noexcept;
+        virtual ~HSlider() noexcept;
 
         /* Copy constructor */
-        ProgressBar(const ProgressBar& other);
+        HSlider(const HSlider& other);
         /* Move constructor */
-        ProgressBar(ProgressBar&& other) noexcept;
+        HSlider(HSlider&& other) noexcept;
 
         /* Copy operator */
-        ProgressBar& operator= (const ProgressBar& other);
+        HSlider& operator= (const HSlider& other);
         /* Move operator */
-        ProgressBar& operator= (ProgressBar&& other) noexcept;
+        HSlider& operator= (HSlider&& other) noexcept;
         //</f>
 
         //<f> Overrides GuiElement
-        // virtual void Input(const SDL_Event& event);
+        virtual void Input(const SDL_Event& event);
 
         // virtual void FixedLogic(float fixed_delta_time);
-        // virtual void Logic(float delta_time);
+        virtual void Logic(float delta_time);
 
         virtual void Render(float delta_time);
         virtual void Render(float delta_time, Camera* camera);
@@ -45,9 +45,6 @@ class ProgressBar : public GuiElement
         //</f>
 
         //<f> Getters/Setters
-        ProgressBarDirection BarDirection() const { return m_bar_direction; }
-        void BarDirection(ProgressBarDirection bar_direction) { m_bar_direction = bar_direction; }
-
         float Value() const { return m_value; }
         /**
          * Set the current value for the ProgressBar. If the value > max or value < min, value will be set to the right limit
@@ -69,29 +66,29 @@ class ProgressBar : public GuiElement
         //update value if we change the range
         void MinValue(float min_value) { m_min_value = min_value; m_value = KeepInInterval(m_value, m_min_value, m_max_value); }
 
+        BaseButton* HeadButton() { return m_head_button.get(); }
+
         void ValueChangedCallback(const std::function<void(float)>& callback){ m_value_changed_callback = callback; }
         std::function<void(float)>* ValueChangedCallback() { return &m_value_changed_callback; }
         //</f>
 
     protected:
         // vars and stuff
-        Texture m_bg_texture;
-        Texture m_bar_texture;
-
-        ProgressBarDirection m_bar_direction;
-
         float m_min_value;
         float m_max_value;
         float m_value;
 
+        std::unique_ptr<BaseButton> m_head_button;
+
+        bool m_drag;
+        int m_mouse_x;
+        int m_mouse_offset_x;
+
         std::function<void(float)> m_value_changed_callback;
 
-        void RenderLeft(SDL_Rect& dst);
-        void RenderRight(SDL_Rect& dst);
-        void RenderUp(SDL_Rect& dst);
-        void RenderDown(SDL_Rect& dst);
+        void SetDragFlag(bool drag);
 };
 
-#endif //SDL_GUI_PROGRESS_BAR_HPP
+#endif //SDL_GUI_HSLIDER_HPP
 
 }//namespace

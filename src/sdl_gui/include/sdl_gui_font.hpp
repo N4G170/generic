@@ -95,6 +95,7 @@ class Font
         //font stats
         int m_font_size;
         int m_max_glyph_w;
+        int m_font_height;
         /**
          * Space between two lines
          */

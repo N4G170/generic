@@ -33,6 +33,8 @@ class GuiTransform
         //</f>
 
         //<f> Getters/Setters
+
+        Position GlobalPositionIgnoreViewport() const;
         /**
         * The position is ajusted to account for the existence or not of a parent viewport (as it has a new origin).
         */
@@ -42,7 +44,7 @@ class GuiTransform
         void LocalPosition(const Position& new_local_position);
 
         void ParentViewport(GuiTransform* parent_viewport);
-        bool ParentViewport() const { return m_parent_viewport; };
+        GuiTransform* ParentViewport() const { return m_parent_viewport; };
 
         // void Parent(GuiTransform* parent);
         // GuiTransform* Parent() const { return m_parent; }

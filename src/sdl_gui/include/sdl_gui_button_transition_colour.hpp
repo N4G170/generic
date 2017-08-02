@@ -44,10 +44,16 @@ class ButtonTransitionColour : public ButtonTransition
          * \brief Set the colour to be applied to on a each of the button state
          */
         void SetStateColour(const SDL_Colour& inactive, const SDL_Colour& active, const SDL_Colour& over, const SDL_Colour& pressed);
+
+        /**
+         * \brief Change the base texture to be used as the colour modulation target (EX: the circle for the radio button)
+         */
+        void ChangeBaseTexture(std::string path);
         //</f>
 
     protected:
         // vars and stuff
+        ResourceManager* m_resource_manager_ptr;
         Texture m_texture;
         SDL_Colour m_current_colour;
         std::unordered_map<ButtonState, SDL_Colour> m_state_colours;

@@ -9,55 +9,18 @@ namespace sdl_gui
 #ifndef SDL_GUI_COLLIDER_HPP
 #define SDL_GUI_COLLIDER_HPP
 
-
-enum ColliderShapeType
+union ColliderSizeUnion
 {
-    BOX,
-    CIRCLE,
-};
-
-class ColliderShape
-{
-    public:
-        ColliderShape(const Position& position, const Dimensions& dimensions, GuiTransform* owner_transform);
-        ColliderShape(const Position& position, int circle_radius, GuiTransform* owner_transform);
-        virtual ~ColliderShape();
-        ColliderShape(const ColliderShape& other);
-        ColliderShape(ColliderShape&& other);
-        ColliderShape& operator= (const ColliderShape& other);
-        ColliderShape& operator= (ColliderShape&& other);
-
-        std::function<bool(int,int)> IsPointColliding;
-
-        void DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour = {0,0,0,255});
-    protected:
-        ColliderShapeType m_type;
-
-        //offset of the shape in relation to its owner
-        Position m_local_position;
-
-        //if shape is a rect
-        Dimensions m_dimensions;
-
-        //if shape is a circle
-        int m_circle_collider_radius;
-        int m_squared_radius;
-
-        //lets us get the global position of this collider parent
-        GuiTransform* m_owner_transform;
-
-        void SetCollisionDetectionFunction();
-        bool BoxPointCollision(int mouse_x, int mouse_y);
-        bool CirclePointCollision(int mouse_x, int mouse_y);
+    Dimensions size;
+    float radius;
 };
 
 class Collider
 {
     public:
-        /* Box constructor */
-        Collider(const Position& position, const Dimensions& rect_collider, GuiTransform* owner_transform);
-        /* Circle constructor */
-        Collider(const Position& position, int circle_radius, GuiTransform* owner_transform);
+        //<f> Constructors, Duplicate & operator=
+        /* constructor */
+        Collider(const Position& position, GuiTransform* owner_transform);
 
         /* Default destructor */
         virtual ~Collider() noexcept;
@@ -67,21 +30,31 @@ class Collider
         /* Move constructor */
         Collider(Collider&& other) noexcept;
 
+        /**
+         * \brief Creates a copy of a derivedelement as a pointer to its base class()this class. Usefull for copying unique_ptrs
+         */
+        virtual Collider* Duplicate() = 0;
+
         /* Copy operator */
         Collider& operator= (const Collider& other);
         /* Move operator */
         Collider& operator= (Collider&& other) noexcept;
+        //</f>
 
-        bool IsPointColliding(int mouse_x, int mouse_y);
+        //<f> Intersection
+        virtual bool IsPointColliding(int mouse_x, int mouse_y) = 0;
+        //</f>
 
-        void SetColliderShape(const Position& position, const Dimensions& dimensions);
-        void SetColliderShape(const Position& centre_position, int circle_radius);
+        //<f> Collider Update
+        virtual void UpdateColliderSize(const ColliderSizeUnion& size) = 0;
+        void UpdateColliderPosition(const Position& position) { m_local_position = position; }
+        //</f>
 
-        void DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour = {0,0,0,255});
+        virtual void DebugRender(SDL_Renderer* renderer_ptr, const SDL_Colour& colour = {0,0,0,255}) = 0;
 
-    private:
+    protected:
         // vars and stuff
-        std::vector<ColliderShape> m_shapes;
+        Position m_local_position;
         GuiTransform* m_owner_transform;
 };
 

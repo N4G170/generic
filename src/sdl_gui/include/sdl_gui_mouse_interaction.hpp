@@ -36,7 +36,7 @@ class MouseInteraction
         /**
          * \brief Evaluate mouse position in relation to given list of colliders
          */
-        virtual void Input(const SDL_Event& event, const std::vector<Collider>& colliders);
+        virtual void Input(const SDL_Event& event, Collider* collider);
 
         /**
          * \brief Process the result from the input function, in a fixed time step
@@ -117,7 +117,7 @@ class MouseInteraction
         std::unordered_map<Uint8, InputKey> m_mouse_buttons;
 
         /* </ CallBacks > */
-        bool MouseInsideCollider(int mouse_x, int mouse_y, const std::vector<Collider>& colliders);
+        bool MouseInsideCollider(int mouse_x, int mouse_y, Collider* collider);
 
         /**
          * Function called by both Logic and FixedLogic as both are the same but with different time input.

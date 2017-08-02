@@ -56,9 +56,9 @@ MouseInteraction& MouseInteraction::operator=(MouseInteraction&& other) noexcept
     return *this;
 }
 
-void MouseInteraction::Input(const SDL_Event& event, const std::vector<Collider>& colliders)
+void MouseInteraction::Input(const SDL_Event& event, Collider* collider)
 {
-    bool inside_collider{ MouseInsideCollider(event.motion.x, event.motion.y, colliders) };
+    bool inside_collider{ MouseInsideCollider(event.motion.x, event.motion.y, collider) };
 
     if(inside_collider)//mouse inside detection area, we can do some stuff
     {
@@ -236,13 +236,10 @@ void MouseInteraction::MouseLogic(float delta_time, float& valid_click_timer)
     }
 }
 
-bool MouseInteraction::MouseInsideCollider(int mouse_x, int mouse_y, const std::vector<Collider>& colliders)
+bool MouseInteraction::MouseInsideCollider(int mouse_x, int mouse_y, Collider* collider)
 {
-    for(auto collider : colliders)
-    {
-        if(collider.IsPointColliding(mouse_x, mouse_y))
-            return true;
-    }
+    if(collider != nullptr && collider->IsPointColliding(mouse_x, mouse_y))
+        return true;
     return false;
 }
 //</f>

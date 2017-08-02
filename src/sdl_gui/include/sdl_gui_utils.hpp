@@ -51,6 +51,43 @@ std::string ToString(const Dimensions& size);
 std::string ToString(const Position& position, const Dimensions& size);
 //</f>
 
+//<f> Maths
+template<typename T>
+T KeepInInterval(T value, T min, T max)
+{
+    if(value < min)
+        value = min;
+    else if(value > max)
+        value = max;
+    return value;
+}
+
+template<typename T>
+T MapValueToRange(T value, T original_min, T original_max, T new_min, T new_max)
+{
+    if(original_max - original_min <= 0 || new_max - new_min <= 0)
+        return new_min;
+
+    auto ratio = (value - original_min) / (original_max - original_min);//move range to origin (EX. (0,0)) and calculate ratio
+
+    //apply ratio to new_max(moved to origin) and then reposition the value inside new range (with + new_min, to move the value to the correct range)
+    return (new_max - new_min) * ratio + new_min;
+}
+
+/**
+ * \brief The ratio = (value - original_min) / (original_max - original_min)
+ */
+template<typename T>
+T MapValueToRange(T ratio, T new_min, T new_max)
+{
+    if(new_max - new_min <= 0)
+        return new_min;
+    //apply ratio to new_max(moved to origin) and then reposition the value inside new range (with + new_min, to move the value to the correct range)
+    return (new_max - new_min) * ratio + new_min;
+}
+
+//</f>
+
 #endif//SDL_GUI_UTILS
 
 }

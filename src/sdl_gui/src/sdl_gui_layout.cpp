@@ -9,7 +9,7 @@ namespace sdl_gui
 
 Layout::Layout(GuiMainPointers main_pointers, const Position& position, const Dimensions& size): GuiElement{main_pointers, position, size},
     // m_layout_config{LayoutWrapMode::LAYOUT_OVERFLOW, {0,0},0,0,0,0,0,0,0,0}
-    m_layout_config{LayoutWrapMode::LAYOUT_OVERFLOW, {250,50},3,2,3,4,5,6,7,8}
+    m_layout_config{LayoutWrapMode::LAYOUT_OVERFLOW, {200,25},3,2,5,5,5,5,5,5}
 {
 
 }
@@ -72,7 +72,7 @@ void Layout::Render(float delta_time, Camera* camera)
 
     if(camera->RectInsideCamera(dst))
     {
-        SDL_SetRenderDrawColor(m_main_pointers.main_renderer_ptr, 80,50,120,255);
+        SDL_SetRenderDrawColor(m_main_pointers.main_renderer_ptr, 255,255,255,255);
         SDL_RenderDrawRect(m_main_pointers.main_renderer_ptr, &dst);
     }
 }
@@ -98,13 +98,16 @@ void Layout::RemoveElement(GuiElement* element)
     auto search_result{std::find_if(std::begin(m_elements), std::end(m_elements), [element](GuiElement* vec_element)->bool{ return *element == *vec_element; } )};
     if(search_result != std::end(m_elements))
         m_elements.erase(search_result);
+
+    //update internal positioning
+    UpdateElementsPositions();
 }
 //</f>
 
 void Layout::UpdateElementsPositions()
 {
-    auto total_lines = m_layout_config.num_of_lines <= 0 ? 1 : m_layout_config.num_of_lines;
-    auto total_columns = m_layout_config.num_of_columns <= 0 ? 1 : m_layout_config.num_of_columns;
+    auto total_lines = m_layout_config.num_of_lines <= 0 ? m_elements.size() : m_layout_config.num_of_lines;
+    auto total_columns = m_layout_config.num_of_columns <= 0 ? m_elements.size() : m_layout_config.num_of_columns;
 
     auto line{0};
     auto column{0};
@@ -130,6 +133,15 @@ void Layout::UpdateElementsPositions()
         }
     }
 
+    ResizeToFit();
+}
+
+void Layout::ResizeToFit()
+{
+    auto bounds{Bounds()};
+
+    //add right and bottom margin to size
+    Size(SizeFromInts(bounds.w + m_layout_config.right_margin, bounds.h + m_layout_config.bottom_margin));
 }
 
 }//namespace

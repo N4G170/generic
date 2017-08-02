@@ -7,15 +7,13 @@
 namespace sdl_gui
 {
 
-
 //<f> Constructors & operator=
 Tooltip::Tooltip(GuiMainPointers main_pointers, const Position& position, const Dimensions& size): GuiElement{main_pointers, position, size},
     m_background_texture{m_main_pointers.resource_manager_ptr->GetTexture(c_img_white_dot)}, m_label_ptr{new Label(main_pointers, position, size)}, m_text{},
     m_wait_time{0}, m_max_wait_time{1.5}, m_can_show{false}
 {
     m_render = false;//hide label
-    m_label_ptr->ConfigLabel(c_default_font_path, c_default_font_size, "tooltip text tooltip text", Colour::Black);
-    m_label_ptr->LineLength(120);
+    m_label_ptr->ConfigLabel(c_default_font_path, c_default_font_size, "tooltip text\ntooltip text", Colour::Black);
 
     AddGuiCollider({0,0}, Size(), this->TransformPtr());
 
@@ -78,7 +76,7 @@ void Tooltip::Input(const SDL_Event& event)
     if( !m_active )
         return;
 
-    m_mouse_interaction.Input(event, m_colliders);
+    m_mouse_interaction.Input(event, m_collider.get());
 }
 
 void Tooltip::ClearInput()
@@ -107,8 +105,8 @@ void Tooltip::Render(float delta_time)
 
 void Tooltip::Render(float delta_time, Camera* camera)
 {
-    for(auto& c : m_colliders)
-        c.DebugRender(m_main_pointers.main_renderer_ptr);
+    if(m_collider)
+        m_collider->DebugRender(m_main_pointers.main_renderer_ptr);
 
     if(!m_render)
         return;
