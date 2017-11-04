@@ -6,7 +6,6 @@
 #include <utility>
 #include "constants.hpp"
 #include "state_interface.hpp"
-#include "sdl_gui_label.hpp"
 
 using Point = std::pair<int,int>;
 
@@ -15,23 +14,25 @@ enum Direction{ UP, DOWN, LEFT, RIGHT };
 class SnakeGame : public StateInterface
 {
     public:
-        SnakeGame(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
+        SnakeGame(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr);
         virtual ~SnakeGame();
 
         /**
          * \brief Precess SDL user input
          */
-        virtual void Input(const SDL_Event&);
+        void Input(const SDL_Event&) override;
 
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float delta_time = 1);
+        void Logic(float delta_time = 1) override;
+
+        void FixedLogic(float fixed_delta_time) override {}
 
         /**
          * \brief Render the state visual elements
          */
-        virtual void Render(SDL_Renderer*, float delta_time);
+        void Render(SDL_Renderer*, float delta_time) override;
 
     private:
         std::array< std::array<short, snake_grid_size>, snake_grid_size > m_grid;
@@ -47,8 +48,6 @@ class SnakeGame : public StateInterface
         void ResetGame();
         void CreateFood();
         Point m_food_position;
-
-        std::vector<sdl_gui::Label*> m_labels;
 };
 
 #endif//SNAKE_GAME_HPP

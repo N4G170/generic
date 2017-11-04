@@ -2,8 +2,8 @@
 #include "random.hpp"
 #include <iostream>
 
-SnakeGame::SnakeGame(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr):
-    StateInterface(state_machine, state_name, resource_manager_ptr)
+SnakeGame::SnakeGame(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):
+    StateInterface(state_machine, state_name, system_manager_ptr)
 {
     int centre = snake_grid_size/2;
     m_snake.push_back({centre, centre});
@@ -27,9 +27,7 @@ SnakeGame::SnakeGame(StateMachine* state_machine, const std::string& state_name,
 
 SnakeGame::~SnakeGame()
 {
-    for(sdl_gui::Label* label : m_labels)
-        delete(label);
-    m_labels.clear();
+
 }
 
 void SnakeGame::Input(const SDL_Event& event)
@@ -154,8 +152,6 @@ void SnakeGame::Render(SDL_Renderer* renderer, float delta_time)
     m_snake_cell.y = cell_size * m_food_position.second + m_offset_y;
     SDL_RenderDrawRect(renderer, &m_snake_cell);
 
-    for(sdl_gui::Label* label : m_labels)
-        label->Render(delta_time);
 }
 
 void SnakeGame::CreateFood()

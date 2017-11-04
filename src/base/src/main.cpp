@@ -12,35 +12,11 @@
 #include "state_machine.hpp"
 #include "constants.hpp"
 
-#include "resource_manager.hpp"
-#include "sdl_gui_font.hpp"
+#include "system_manager.hpp"
+#include "shapes.hpp"
+#include "deleters.hpp"
 
 // <f> SDL init/terminate
-
-struct SDLDeleters
-{
-    void operator() (SDL_Window* window)
-    {
-        //MessageWriter::Instance()->WriteLineToConsole("Calling destroy for SDL_window object pointer...");
-        std::cout << "Calling destroy for SDL_window object pointer... \n";
-        SDL_DestroyWindow(window);
-    }
-
-    void operator() (SDL_Renderer* screen_renderer)
-    {
-        //MessageWriter::Instance()->WriteLineToConsole("Calling destroy for SDL_Renderer object pointer...");
-        std::cout << "Calling destroy for SDL_Renderer object pointer... \n";
-        SDL_DestroyRenderer(screen_renderer);
-    }
-
-    void operator() (TTF_Font* font)
-    {
-        //MessageWriter::Instance()->WriteLineToConsole("Calling destroy for TTF_Font object pointer...");
-        std::cout << "Calling destroy for TTF_Font object pointer... \n";
-        TTF_CloseFont( font );
-    }
-};
-
 bool InitSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_ptr<SDL_Renderer, SDLDeleters>& renderer)
 {
     //Initialize SDL
@@ -133,12 +109,6 @@ void TerminateSDL(std::unique_ptr<SDL_Window, SDLDeleters>& window, std::unique_
 
 // </f>
 
-#include "sdl_gui_collider.hpp"
-#include "sdl_gui_label.hpp"
-#include "shapes.hpp"
-#include "sdl_gui_resource_manager.hpp"
-
-
 // <f> MAIN
 int main(int argc, char *argv[])
 {
@@ -159,12 +129,11 @@ int main(int argc, char *argv[])
     }
     else
     {
-        // ResourceManager resource_manager(renderer.get());
-        sdl_gui::ResourceManager resource_manager{renderer.get()};
+        SystemManager system_manager{window.get(), renderer.get()};
 
         bool quit{false};
         //initializes the first state that will run
-        StateMachine state_machine {renderer.get(), &resource_manager, &quit};
+        StateMachine state_machine {&system_manager, &quit};
         state_machine.ChangeState(StateName::Menu);
 
         //Create Event handler
@@ -204,7 +173,7 @@ int main(int argc, char *argv[])
                 {
                     switch(event.key.keysym.sym)
                     {
-                        //case SDLK_ESCAPE: quit = true; break;
+                        // case SDLK_ESCAPE: quit = true; break;
                         // case SDLK_f:
                         // fullscreen = !fullscreen;
                         //
@@ -216,24 +185,27 @@ int main(int argc, char *argv[])
                     }
                 }
 
+                system_manager.Input(event);
                 state_machine.Input(event);
-
             }
 
             //Fixed time step Logic
             while(accumulated_time >= fixed_frame_time)
             {
+                system_manager.FixedLogic(fixed_frame_time);
                 state_machine.FixedLogic(fixed_frame_time);
                 accumulated_time -= fixed_frame_time;
             }
 
             //Variable time step Logic
+            system_manager.Logic(last_frame_time);
             state_machine.Logic(last_frame_time);
 
             //Clear screen
             SDL_SetRenderDrawColor( renderer.get(), 0x00, 0x00, 0x00, 0x00 );
             SDL_RenderClear( renderer.get() );
 
+			system_manager.Render(last_frame_time);
 			state_machine.Render(last_frame_time);
 
 			//Update screen
@@ -255,6 +227,9 @@ int main(int argc, char *argv[])
             last_frame_time = frame_time;
 
             SDL_SetWindowTitle(window.get(), ( window_name +" - "+ std::to_string(fps)+" FPS").c_str() );
+
+            //run destroy check
+            system_manager.DestroyElements();
 
         }//while(!quit)
     }

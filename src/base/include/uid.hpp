@@ -3,12 +3,9 @@
 
 #include <bitset>
 
-using UID = std::bitset<16>;
-//set of bit that will be incremented. the bit missing will be flags to mark the type of id
-using UID_COUNT = std::bitset<12>;
-using UID_CONTEXT = std::bitset<4>;
+using UID = size_t;
 
-enum UIDType
+enum class IDType
 {
     GLOBAL = 0,
     GUI = 1
@@ -21,6 +18,9 @@ struct BitSetSize;
 template< std::size_t S >
 struct BitSetSize< std::bitset< S > > : std::integral_constant< std::size_t, S > {};
 
-UID GenerateUID(UIDType type = UIDType::GLOBAL);
+/**
+ * \brief Generates a new UID (custom algorithm). Thread safe
+ */
+UID GenerateUID();
 
 #endif//UID_HPP

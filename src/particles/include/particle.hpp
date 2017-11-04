@@ -2,14 +2,15 @@
 #define PARTICLE_HPP
 
 #include "SDL.h"
-#include "sdl_gui_resource_manager.hpp"
+#include "behaviour_script.hpp"
+#include "vector3.hpp"
 
-class Particle
+class Particle: public BehaviourScript
 {
     public:
         //<f> Constructors & operator=
         /** brief Default constructor */
-        explicit Particle(SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr);
+        Particle();
         /** brief Default destructor */
         virtual ~Particle() noexcept;
 
@@ -25,24 +26,46 @@ class Particle
         //</f>
 
         //<f> Virtual Methods
-
+        Script* Clone() override;
+        void Update(float delta_time) override;
         //</f>
 
         //<f> Methods
-        void Logic(float delta_time);
-        void FixedLogic(float fixed_delta_time);
-        void Render(float delta_time);
+        void Release();
+        void Stop();
+        void StopAndDestroy();
         //</f>
 
         //<f> Getters/Setters
+        void Config(float ttl, const Vector3<float>& direction, float velocity, float z_rotation, bool in_global_space);
 
+        float TTL() const;
+        void TTL(float ttl);
+
+        Vector3<float> Direction() const;
+        void Direction(const Vector3<float>& direction);
+
+        float Velocity() const;
+        void Velocity(float velocity);
+
+        float Rotation() const;
+        void Rotation(float rotation);
+
+        bool GlobalSpace() const;
+        void GlobalSpace(bool global_space);
         //</f>
 
     protected:
         // vars and stuff
-        SDL_Texture* m_particle_texture;
 
     private:
+        bool m_released;
+        float m_ttl;
+        Vector3<float> m_direction;
+        float m_velocity;
+        // Vector3<float> m_velocity;
+        float m_rotation;
+        bool m_global_space;
 };
 
 #endif //PARTICLE_HPP

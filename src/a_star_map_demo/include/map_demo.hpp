@@ -2,63 +2,38 @@
 #define MAP_DEMO_HPP
 
 #include <vector>
-#include "sdl_gui_label.hpp"
 #include "state_interface.hpp"
-#include "cell.hpp"
-#include "army.hpp"
-#include "infobox.hpp"
+#include "map.hpp"
 
 class MapDemo : public StateInterface
 {
-    enum LabelsId
-    {
-        TITLE,
-        MOUSE_POSITION,
-        CURRENT_CELL,
-        SELECTED_CELL,
-        ARMY,
-        NAVY,
-        BR1,
-        BR2,
-        BR3,
-        BR4,
-        BR5,
-        BR6,
-        L1,
-        L2,
-        L3,
-        L4,
-        BACK,
-    };
-
     public:
-        MapDemo(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
+        MapDemo(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr);
         ~MapDemo();
         /**
          * \brief Precess SDL user input
          */
-        virtual void Input(const SDL_Event&);
+        void Input(const SDL_Event&) override;
 
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float fixed_frame_time = 1);
+        void Logic(float fixed_frame_time = 1) override;
+
+        void FixedLogic(float fixed_delta_time) override {}
 
         /**
          * \brief Render the state visual elements
          */
-        virtual void Render(SDL_Renderer*, float delta_time);
+        void Render(SDL_Renderer*, float delta_time) override;
 
-        //Callbacks
-        void CellMouseHover(int cell_index);
-        void CellMouseClick(int cell_index);
-
-        //void ArmyMouseHover();
-        void ArmyMouseClick();
+        void Enter() override;
+        void Exit() override;
 
     private:
-        Infobox m_infobox;
-        std::vector<Cell> m_map;
+        Map* m_map_script;
+        // Infobox m_infobox;
+        // std::vector<Cell> m_map;
         Transform m_origin;
 
         SDL_Rect m_outter_box{30,30,1440,940};
@@ -81,7 +56,7 @@ class MapDemo : public StateInterface
         int m_selected_cell_index;
 
         //armies
-        Army m_player_army;
+        // Army m_player_army;
         bool m_army_selected;
 };
 

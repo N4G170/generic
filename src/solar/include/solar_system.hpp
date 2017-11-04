@@ -2,53 +2,52 @@
 #define SOLAR_SYSTEM_HPP
 
 #include <vector>
+#include <unordered_map>
 #include "state_interface.hpp"
-#include "vector2.hpp"
-#include "sdl_gui_label.hpp"
+#include "vector3.hpp"
 
-#include "celestial_body.hpp"
-#include "xeno.hpp"
-#include "space_rock.hpp"
+#include "enums.hpp"
+#include "object.hpp"
+#include "planet.hpp"
+#include "comet.hpp"
+#include "resource_manager.hpp"
 
 
 class SolarSystem : public StateInterface
 {
     public:
-        SolarSystem(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
-        virtual ~SolarSystem();
+        SolarSystem(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr);
+        virtual ~SolarSystem() noexcept;
 
         /**
          * \brief Precess SDL user input
          */
-        virtual void Input(const SDL_Event&);
+        void Input(const SDL_Event&) override;
 
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float delta_time = 1);
+        void Logic(float delta_time = 1) override;
+
+        /**
+         * \brief Process any logic, runs after input
+         */
+        void FixedLogic(float fixed_delta_time = 1) override;
 
         /**
          * \brief Render the state visual elements
          */
-        virtual void Render(SDL_Renderer*, float delta_time);
+        void Render(SDL_Renderer*, float delta_time) override;
+
+        void Enter() override;
+        void Exit() override;
 
     private:
-        std::vector<sdl_gui::Label*> m_labels;
-        std::vector<Vector2<int>> m_background_stars;
+        std::vector<Planet*> m_planets;
+        std::vector<Comet*> m_comets;
+
         bool m_show_orbit;
         bool m_pause;
-
-        CelestialBody m_system_center;
-        CelestialBody m_sun;
-        CelestialBody m_sun_twin;
-        CelestialBody m_mercury;
-        CelestialBody m_venus;
-        CelestialBody m_terra;
-        CelestialBody m_luna;
-        Xeno m_xeno;
-
-        std::vector<SpaceRock> m_space_rocks;
-        std::vector<CelestialBodies*> m_all_bodies;
 };
 
 #endif //SOLAR_SYSTEM_HPP

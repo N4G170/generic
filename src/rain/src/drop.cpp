@@ -2,71 +2,142 @@
 #include "constants.hpp"
 #include <iostream>
 #include "random.hpp"
+#include "object.hpp"
+#include "utils.hpp"
 
-Drop::Drop(const std::function<void()>& drop_sound):m_drop_sound{drop_sound}
+//<f> Constructors & operator=
+Drop::Drop(SystemManager* system_manager): BehaviourScript{}, m_velocity{}, m_wind{}
 {
-    m_colour = Colour::Rain_Drop_Blue;
-    NewStartPosition();
+    m_splash_object = system_manager->Objects()->CreateObject();
+    m_splash_animation = new BasicFrameAnimation();
+    m_splash_object->AddScript(m_splash_animation);
+    m_splash_object->TransformPtr()->LocalScale({9,6,1});
+    m_splash_object->Disable();
 
-    m_splash_time = 1;
-    m_show_splash = false;
+    m_splash_animation->AddFrame("data/img/splash.png", true, {0,0,9,6});
+    m_splash_animation->AddFrame("data/img/splash.png", true, {9,0,9,6});
+    m_splash_animation->AddFrame("data/img/splash.png", true, {18,0,9,6});
+    m_splash_animation->AddFrame("data/img/splash.png", true, {27,0,9,6});
+    m_splash_animation->AddFrame("data/img/splash.png", true, {36,0,9,6});
+    m_splash_animation->FPS(4);
+
+    auto splash_img{ new Image{system_manager}};
+    m_splash_animation->SetImage(splash_img);
+    m_splash_object->AddScript(splash_img);
 }
 
-void Drop::Logic(float delta_time)
-{
-    //physics
-    m_transform.PositionY( m_transform.PositionY() + std::max(1, static_cast<int>(m_velocity * delta_time)) );
+Drop::~Drop() noexcept {}
 
-    //splash
-    if(m_transform.PositionY() > window_height)
+Drop::Drop(const Drop& other): BehaviourScript{other}, m_velocity{other.m_velocity}, m_wind{other.m_wind} {}
+
+Drop::Drop(Drop&& other) noexcept: BehaviourScript{std::move(other)}, m_velocity{std::move(other.m_velocity)}, m_wind{std::move(other.m_wind)} {}
+
+Drop& Drop::operator=(const Drop& other)
+{
+    if(this != &other)
     {
-        if(m_z_index < 5)//first five layers
+        auto tmp{other};
+        *this = std::move(tmp);
+    }
+    return *this;
+}
+Drop& Drop::operator=(Drop&& other) noexcept
+{
+    if(this != &other)
+    {
+        BehaviourScript::operator=(std::move(other));
+        m_velocity = std::move(other.m_velocity);
+        m_wind = std::move(other.m_wind);
+    }
+    return *this;
+}
+//</f> /Constructors & operator=
+
+//<f> Virtual Methods
+Drop* Drop::Clone() { return new Drop{*this}; }
+
+void Drop::Update(float delta_time)
+{
+    if(m_owner == nullptr)
+        return;
+
+    //drop drop
+    auto position{m_owner->TransformPtr()->LocalPosition()};
+    auto size{m_owner->TransformPtr()->LocalScale()};
+
+    position += (m_velocity + m_wind) * delta_time;
+
+    if(position.Z() < c_min_drop_z || position.Z() > c_max_drop_z)
+        ResetDrop();
+
+    // size.Z(  );
+
+    m_owner->TransformPtr()->LocalPosition(position);
+
+    if(position.Y() > window_height - size.Y())//debug check
+    {
+        if(position.Z() < 6)
         {
-            m_splash = DimensionsRect();
-            m_splash_time = 0;
-            m_show_splash = true;
-            if(m_z_index < 1)
-                m_drop_sound();
+            m_splash_object->TransformPtr()->LocalPositionX(position.X());
+            m_splash_object->TransformPtr()->LocalPositionY(window_height - size.Y());
+            m_splash_object->Enable();
+            m_splash_animation->Play();
         }
 
-        NewStartPosition();
+        ResetDrop();
     }
-}
 
-void Drop::Render(SDL_Renderer* renderer, float delta_time)
-{
-    SDL_SetRenderDrawColor( renderer, m_colour.r, m_colour.g, m_colour.b, m_colour.a );
-    SDL_Rect rect = DimensionsRect();
-    SDL_RenderFillRect(renderer, &rect);
-
-    if(m_show_splash)
+    if(!m_splash_animation->IsPlaying())
     {
-        int x1 {m_splash.x - m_splash.w}; int y1 {window_height - m_splash.h / 2};
-        int x2 {m_splash.x}; int y2 {window_height};
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2 );
-
-        x1 = m_splash.x + m_splash.w + m_splash.w;
-        x2 = m_splash.x + m_splash.w;
-        SDL_RenderDrawLine(renderer, x1, y1, x2, y2 );
-    }
-
-    m_splash_time += delta_time;
-    if(m_splash_time > 0.2 && m_show_splash)
-    {
-        m_show_splash = false;
+        m_splash_object->Disable();
+        m_splash_animation->Stop();
     }
 }
+//</f> /Virtual Methods
 
-void Drop::NewStartPosition()
+//<f> Get/Set
+Vector3<float> Drop::Velocity() const { return m_velocity; }
+void Drop::Velocity(const Vector3<float>& velocity) { m_velocity = velocity; }
+
+/**
+ * \brief Apply a force to current velocity
+ */
+void Drop::ChangeVelocity(const Vector3<float>& force) { m_velocity += force; }
+
+void Drop::ChangeWindForce(const Vector3<float>& wind) { m_wind = wind; }
+//</f> /Get/Set
+
+//<f> Methods
+void Drop::DropHit(Collider* other)
 {
-    m_z_index = Random(0,15);
-
-    m_transform.Width( 3 - static_cast<int>(m_z_index / 5) );
-    m_transform.Height( std::max(1, 10 - (static_cast<int>(m_z_index / 3) * 2) ) );
-
-    m_transform.PositionX( Random(0, window_width - m_transform.Height()) );
-    //the left parameter is negative
-    m_transform.PositionY( Random(-1 * m_transform.Height() - window_height, m_transform.Height()) );
-
-    m_velocity = (20 - m_z_index) * 50;
+    if(other->Owner()->HasTag("floor"))
+    {
+        ResetDrop();
+    }
 }
+
+void Drop::ResetDrop()
+{
+    if(m_owner == nullptr)
+        return;
+
+    auto depth {Random( c_min_drop_z, c_max_drop_z )};
+    auto size{m_owner->TransformPtr()->LocalScale()};
+
+    auto drop_width{MapValueToRange(depth, c_min_drop_z, c_max_drop_z, c_min_drop_width, c_max_drop_width)};
+
+    size.X( drop_width );//from 3 to 1
+    size.Y( drop_width + 1 );//height = 2 * width
+    m_owner->TransformPtr()->LocalScale(size);
+
+    //position
+    auto position{m_owner->TransformPtr()->LocalPosition()};
+    position.X( Random( -c_max_wind_x_force, window_width + c_max_wind_x_force ) );
+    position.Y( Random( -size.Y(), window_height * -1.f ) );
+    position.Z( Random( c_min_drop_z, c_max_drop_z) );
+    m_owner->TransformPtr()->LocalPosition(position);
+
+    m_velocity = {0,1,0};//reset
+    m_velocity *= (20 - depth) * 50;
+}
+//</f> /Methods

@@ -1,13 +1,13 @@
 #ifndef XENO_HPP
 #define XENO_HPP
 
-#include "celestial_body.hpp"
+#include "planet.hpp"
 
-class Xeno : public CelestialBody
+class Xeno// : public Planet
 {
     public:
         Xeno();
-        virtual void Move(float fixed_frame_time);
+        virtual void Logic(float fixed_frame_time);
     private:
         float m_rotation_sin;
         float m_rotation_cos;

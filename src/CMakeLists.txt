@@ -9,7 +9,7 @@ set(HEADER_FILES_TMP "")
 set(INCLUDE_DIRECTORIES_TMP "")
 
 #list of subdiretories
-set(FOLDERS a_star_map_demo rain snake base influence_wars sdl_gui solar particles)
+set(FOLDERS a_star_map_demo rain snake base influence_wars solar particles other)
 
 foreach(folder ${FOLDERS})
 	add_subdirectory(${folder})

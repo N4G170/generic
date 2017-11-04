@@ -1,144 +1,190 @@
-#include <algorithm>
-
 #include "army.hpp"
-#include "utils.hpp"
-#include "message_writer.hpp"
+#include <utility>
+#include "object.hpp"
+#include <iostream>
+#include "random.hpp"
+#include "constants.hpp"
+#include "map.hpp"
+#include "pathfind.hpp"
+#include "debug_render.hpp"
 
-Army::Army():m_current_body_index{0}, m_health{100}, m_damage{1}, m_mouse_hover{false}, m_selected{false}, m_offset_x{0}, m_offset_y{0}, m_origin_correction_x{0}, m_origin_correction_y{0}
-{
-    m_box_collider = {15,4,20,42};
-
-    m_bodies.resize(15);
-    int index{0};
-
-    //idle f1
-    m_bodies[index]["Head"] = {22,5,5,5};
-    m_bodies[index]["Torso"] = {20,10,10,15};
-    m_bodies[index]["Left_Leg"] = {20,20,3,25};
-    m_bodies[index]["Right_Leg"] = {27,20,3,25};
-    m_bodies[index]["Weapon"] = {17,5,2,40};
-    ++index;
-
-    //combat left
-    m_bodies[index]["Head"] = {12,5,5,5};
-    m_bodies[index]["Torso"] = {10,10,10,15};
-    m_bodies[index]["Left_Leg"] = {10,20,3,25};
-    m_bodies[index]["Right_Leg"] = {17,20,3,25};
-    m_bodies[index]["Weapon"] = {7,5,2,40};
-    ++index;
-
-    //combat attack left
-    m_bodies[index]["Head"] = {12,5,5,5};
-    m_bodies[index]["Torso"] = {10,10,10,15};
-    m_bodies[index]["Left_Leg"] = {10,20,3,25};
-    m_bodies[index]["Right_Leg"] = {17,20,3,25};
-    m_bodies[index]["Weapon"] = {7,17,40,2};
-    ++index;
-
-    //combat right
-    m_bodies[index]["Head"] = {32,5,5,5};
-    m_bodies[index]["Torso"] = {30,10,10,15};
-    m_bodies[index]["Left_Leg"] = {30,20,3,25};
-    m_bodies[index]["Right_Leg"] = {37,20,3,25};
-    m_bodies[index]["Weapon"] = {41,5,2,40};
-    ++index;
-
-    //combat attack right
-    m_bodies[index]["Head"] = {32,5,5,5};
-    m_bodies[index]["Torso"] = {30,10,10,15};
-    m_bodies[index]["Left_Leg"] = {30,20,3,25};
-    m_bodies[index]["Right_Leg"] = {37,20,3,25};
-    m_bodies[index]["Weapon"] = {7,14,40,2};
-}
-
-Army::~Army()
+//<f> Constructors & operator=
+Army::Army(MapStats* map_stats): BehaviourScript{},
+    m_moving{false}, m_velocity{1,1,1}, m_direction{0,0,0}, m_destination{0,0,0}, m_position_error_squared{15},
+    m_map_stats{map_stats}, m_path{}, m_path_positions{}, m_current_path_index{0}, m_target_cell_index{-1}, m_colour{255,255,255,255}, m_army_index{0}
 {
 
 }
 
-void Army::Input(const SDL_Event& event)
+Army::~Army() noexcept
 {
-    if(event.type == SDL_KEYDOWN)
+
+}
+
+Army::Army(const Army& other)
+{
+
+}
+
+Army::Army(Army&& other) noexcept
+{
+
+}
+
+Army& Army::operator=(const Army& other)
+{
+    if(this != &other)//not same ref
     {
-        switch(event.key.keysym.sym)
+        auto tmp(other);
+        *this = std::move(tmp);
+    }
+
+    return *this;
+}
+
+Army& Army::operator=(Army&& other) noexcept
+{
+    if(this != &other)//not same ref
+    {
+        //move here
+    }
+    return *this;
+}
+//</f> /Constructors & operator=
+
+//<f> Virtual Methods
+Script* Army::Clone() { return new Army{*this};}
+
+void Army::Update(float delta_time)
+{
+    if(m_owner == nullptr)
+        return;
+
+    if(m_moving)
+    {
+        auto position{m_owner->TransformPtr()->LocalPosition()};
+
+        if(position.DistanceSquared(m_destination) > m_position_error_squared)//did not reach destination
         {
-            case SDLK_p: m_current_body_index = std::min(m_current_body_index+1, (signed)m_bodies.size()); break;
-            case SDLK_o: m_current_body_index = std::max(m_current_body_index-1, 0); break;
+            position += m_direction * m_velocity * 2;
+        }
+        else
+        {
+            position = m_destination;
+            m_moving = false;
+
+            //increase path index
+            ++m_current_path_index;
+
+            if(m_current_path_index >= m_path_positions.size() - 1)//reached last valid position
+            {
+                m_current_path_index = 0;
+
+                //calculate new path
+                m_start_cell_index = m_target_cell_index;
+                NewPath();
+                CalculateDirection( m_path_positions[m_current_path_index + 1] );
+                Move();
+            }
+            else
+            {
+                CalculateDirection( m_path_positions[m_current_path_index + 1] );
+                Move();
+            }
+        }
+        m_owner->TransformPtr()->LocalPosition(position);
+
+        //set path debug render
+        for(auto i{0}; i < m_path_positions.size() - 1; ++i)
+        {
+            auto parent_position { m_owner->TransformPtr()->Parent()->LocalPosition() };
+            DebugRender::Instance()->RenderDrawLine(m_path_positions[i] + parent_position, m_path_positions[i+1] + parent_position, m_colour, m_army_index);
+        }
+    }
+}
+//</f> /Virtual Methods
+
+//<f> Getters/Setters
+void Army::Move() { m_moving = true; }
+void Army::Stop() { m_moving = false; }
+void Army::Moving(bool moving) { m_moving = moving; }
+bool Army::Moving() const { return m_moving; }
+void Army::Colour(const SDL_Colour& colour) { m_colour = colour; }
+SDL_Colour Army::Colour() const { return m_colour; }
+void Army::ArmyIndex(int index) { m_army_index = index; }
+int Army::ArmyIndex() const { return m_army_index; }
+//</f> /Getters/Setters
+
+void Army::Start()
+{
+    NewStartingPosition();
+    NewPath();
+    CalculateDirection( m_path_positions[1] );
+    Move();
+}
+
+void Army::CalculateDirection(const Vector3<float>& destination)
+{
+    m_destination = destination;
+
+    auto position{m_owner->TransformPtr()->LocalPosition()};
+    m_direction = m_destination - position;
+    m_direction.Z(-0.5f);
+    m_direction.Normalize();
+}
+
+void Army::NewStartingPosition()
+{
+    if(m_map_stats->positions.empty())
+    {
+        m_owner->TransformPtr()->LocalPosition({0,0,0});
+    }
+    else
+    {
+        while(true)
+        {
+            auto random{Random(0, m_map_stats->positions.size() - 1)};
+
+            if(m_map_stats->map_costs[random] > 0)//valid cell
+            {
+                auto position{m_map_stats->positions[random]};
+                position.Z(-0.5f);
+                m_owner->TransformPtr()->LocalPosition(position);
+
+                m_target_cell_index = m_start_cell_index = random;
+                return;
+            }
+        }
+    }
+}
+
+void Army::NewPath()
+{
+    while(true)
+    {
+        auto random{Random(0, m_map_stats->map_costs.size() - 1)};
+
+        if(m_map_stats->map_costs[random] > 0 )//valid cell
+        {
+            m_path = FindPath(GetCoordinateX(m_start_cell_index, m_map_stats->map_width_cell_count),
+                            GetCoordinateY(m_start_cell_index, m_map_stats->map_width_cell_count),
+                            GetCoordinateX(random, m_map_stats->map_width_cell_count),
+                            GetCoordinateY(random, m_map_stats->map_width_cell_count),
+                            // m_map_stats->map_costs.data(), m_map_stats->map_width_cell_count, m_map_stats->map_height_cell_count, NeighbourSearchType::QUARTILE);
+                            m_map_stats->map_costs.data(), m_map_stats->map_width_cell_count, m_map_stats->map_height_cell_count, NeighbourSearchType::OCTILE_CORNER_CUT);
+            break;
         }
     }
 
+    //convert path indeces to positions
+    m_path_positions.clear();
+    for(auto i : m_path)
     {
-        int mouse_x = event.motion.x;
-        int mouse_y = event.motion.y;
-
-        m_mouse_hover = false;
-        SDL_Rect auxilia = m_box_collider;
-        auxilia.x += m_offset_x + m_origin_correction_x;
-        auxilia.y += m_offset_y + m_origin_correction_y;
-
-        if(PointInsideRect(auxilia, mouse_x, mouse_y))
-        {
-            m_mouse_hover = true;
-        }
+        auto position{m_map_stats->positions[i]};
+        position.Z(-0.5f);
+        m_path_positions.push_back(position);
     }
 
-    {
-        if(m_mouse_hover && event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT && MouseClickCallBack != nullptr)
-        {
-            MouseClickCallBack();
-            m_selected = true;
-        }
-    }
-}
-
-void Army::Logic(float fixed_frame_time)
-{
-    m_transform.UpdateSDLRects();
-    m_offset_x = m_transform.GetGlobalSDLRect().x;
-    m_offset_y = m_transform.GetGlobalSDLRect().y;
-}
-
-void Army::Render(SDL_Renderer *renderer, float delta_time, float scale)
-{
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_Rect auxilia_rect{m_bodies[m_current_body_index]["Head"]};
-    auxilia_rect.x += m_offset_x;
-    auxilia_rect.y += m_offset_y;
-    SDL_RenderFillRect(renderer, &auxilia_rect);
-
-    auxilia_rect = m_bodies[m_current_body_index]["Left_Leg"];
-    auxilia_rect.x += m_offset_x;
-    auxilia_rect.y += m_offset_y;
-    SDL_RenderFillRect(renderer, &auxilia_rect);
-
-    auxilia_rect = m_bodies[m_current_body_index]["Weapon"];
-    auxilia_rect.x += m_offset_x;
-    auxilia_rect.y += m_offset_y;
-    SDL_RenderFillRect(renderer, &auxilia_rect);
-
-    SDL_SetRenderDrawColor(renderer, 255, 127, 127, 255);
-    auxilia_rect = m_bodies[m_current_body_index]["Right_Leg"];
-    auxilia_rect.x += m_offset_x;
-    auxilia_rect.y += m_offset_y;
-    SDL_RenderFillRect(renderer, &auxilia_rect);
-
-    SDL_SetRenderDrawColor(renderer, 255, 0, 127, 255);
-    auxilia_rect = m_bodies[m_current_body_index]["Torso"];
-    auxilia_rect.x += m_offset_x;
-    auxilia_rect.y += m_offset_y;
-    SDL_RenderFillRect(renderer, &auxilia_rect);
-
-    if(m_mouse_hover)
-    {
-        auxilia_rect = m_box_collider;
-        auxilia_rect.x += m_offset_x;
-        auxilia_rect.y += m_offset_y;
-        SDL_RenderDrawRect(renderer, &auxilia_rect);
-    }
-}
-
-void Army::CorrectOriginPosition(float x_correction, float y_correction)
-{
-    m_origin_correction_x = x_correction;
-    m_origin_correction_y = y_correction;
+    m_start_cell_index = m_path.front();
+    m_target_cell_index = m_path.back();
 }

@@ -91,10 +91,10 @@ PerlinNoise noise_obj_e1(Random(0,256));
 //VORONOI
 struct Data{};
 
-InfluenceWars::InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr):
-    StateInterface(state_machine, state_name, resource_manager_ptr)
+InfluenceWars::InfluenceWars(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):
+    StateInterface(state_machine, state_name, system_manager_ptr)
 {
-    Draw(renderer);
+    Draw(m_system_manager_ptr->Renderer());
 
     // Graph<Data> graph;
     // GraphNode<Data> node_1;

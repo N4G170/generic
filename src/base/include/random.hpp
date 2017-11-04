@@ -7,14 +7,19 @@ std::default_random_engine& RandomEngine();
 
 void GenerateNewSeed();
 
-//Max inclusive
+//** \brief Max inclusive */
 int Random(int min, int max);
-//Max inclusive
+//** \brief Max inclusive */
 int Random(int min, int max, uint32_t seed);
 
-//Max inclusive
+//** \brief Max inclusive */
+float Random(float min, float max);
+//** \brief Max inclusive */
+float Random(float min, float max, uint32_t seed);
+
+//** \brief Max inclusive */
 double Random(double min, double max);
-//Max inclusive
+//** \brief Max inclusive */
 double Random(double min, double max, uint32_t seed);
 
 

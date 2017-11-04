@@ -4,7 +4,7 @@
 #include "SDL.h"
 
 #include "state_machine.hpp"
-#include "sdl_gui_resource_manager.hpp"
+#include "system_manager.hpp"
 
 class StateMachine;
 struct MainFlags;
@@ -16,15 +16,15 @@ class StateInterface
 {
     public:
         //<f> Constructors & operator=
-        StateInterface(StateMachine* state_machine, const std::string& state_name, sdl_gui::ResourceManager* resource_manager_ptr):m_state_machine_ptr{state_machine},
-        m_resource_manager_ptr{resource_manager_ptr}, m_state_name{state_name} {};
+        StateInterface(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):m_state_machine_ptr{state_machine},
+        m_system_manager_ptr{system_manager_ptr}, m_state_name{state_name} {};
 
-        virtual ~StateInterface(){ m_state_machine_ptr = nullptr; m_resource_manager_ptr = nullptr; };
+        virtual ~StateInterface(){ m_state_machine_ptr = nullptr; m_system_manager_ptr = nullptr; };
 
-        StateInterface(const StateInterface& other) : m_state_machine_ptr{other.m_state_machine_ptr}, m_resource_manager_ptr{other.m_resource_manager_ptr},
+        StateInterface(const StateInterface& other) : m_state_machine_ptr{other.m_state_machine_ptr}, m_system_manager_ptr{other.m_system_manager_ptr},
             m_state_name{other.m_state_name} {};
 
-        StateInterface(StateInterface&& other) : m_state_machine_ptr{std::move(other.m_state_machine_ptr)}, m_resource_manager_ptr{std::move(other.m_resource_manager_ptr)},
+        StateInterface(StateInterface&& other) : m_state_machine_ptr{std::move(other.m_state_machine_ptr)}, m_system_manager_ptr{std::move(other.m_system_manager_ptr)},
             m_state_name{std::move(other.m_state_name)} {};
 
         StateInterface& operator= (const StateInterface& other)
@@ -32,7 +32,7 @@ class StateInterface
             if(this != &other)
             {
                 m_state_machine_ptr = other.m_state_machine_ptr;
-                m_resource_manager_ptr = other.m_resource_manager_ptr;
+                m_system_manager_ptr = other.m_system_manager_ptr;
                 m_state_name = other.m_state_name;
             }
             return *this;
@@ -42,7 +42,7 @@ class StateInterface
             if(this != &other)
             {
                 m_state_machine_ptr = std::move(other.m_state_machine_ptr);
-                m_resource_manager_ptr = std::move(other.m_resource_manager_ptr);
+                m_system_manager_ptr = std::move(other.m_system_manager_ptr);
                 m_state_name = std::move(other.m_state_name);
             }
             return *this;
@@ -60,7 +60,7 @@ class StateInterface
          */
         virtual void Logic(float delta_time = 1) = 0;
 
-        // virtual void FixedLogic(float fixed_delta_time = 1) = 0;
+        virtual void FixedLogic(float fixed_delta_time = 1) = 0;
 
         /**
          * \brief Render the state visual elements
@@ -84,7 +84,7 @@ class StateInterface
 
     protected:
         StateMachine* m_state_machine_ptr;
-        sdl_gui::ResourceManager* m_resource_manager_ptr;
+        SystemManager* m_system_manager_ptr;
     private:
         std::string m_state_name;
 };

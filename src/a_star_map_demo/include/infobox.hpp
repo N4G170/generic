@@ -4,7 +4,6 @@
 #include <map>
 // #include <initializer_list>
 #include "object.hpp"
-#include "sdl_gui_label.hpp"
 #include "constants.hpp"
 
 // struct LabelInitData
@@ -33,7 +32,6 @@ class Infobox: public Object
 
         // void CreateLabels(std::initializer_list<LabelInitData> labels_data);
         // void CreateLabel(LabelInitData label_data);
-        void CreateLabel(const int id, SDL_Renderer* renderer, TTF_Font* font, float local_x, float local_y, std::string text, SDL_Colour colour);
         void ChangeText(const int id, const std::string& new_text);
         void ChangeColour(const int id, SDL_Colour new_colour);
 
@@ -43,7 +41,6 @@ class Infobox: public Object
         bool m_show_bg;
         bool m_apply_bg_alpha;
 
-        std::map<int, sdl_gui::Label> m_labels;
         inline bool LabelExists(const int id);
         /**
          * Updates the global positions of the labels. Called when infobox position is updated

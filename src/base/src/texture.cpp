@@ -1,107 +1,82 @@
 #include "texture.hpp"
 #include <utility>
 #include <iostream>
-#include "SDL_image.h"
 
-Texture::Texture(const std::string& source_path, SDL_Renderer* renderer_ptr): m_width{0}, m_height{0},
-    m_pixel_format{0}, m_texture_access{0}, m_renderer_ptr{renderer_ptr},  m_texture_ptr{nullptr}
-{
-    SDL_Surface* surface = IMG_Load(source_path.c_str());
-    if( !surface )
-    {
-        std::cout<< "Unable to load image file \""<< source_path <<"\"! SDL Error: "<< SDL_GetError()<<std::endl;
+Texture::Texture():m_renderer_ptr{nullptr}, m_texture_ptr{nullptr}, m_colour_modulation{255,255,255,255}, m_image_path{} {}
 
-        m_texture_ptr = SDL_CreateTexture(m_renderer_ptr, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, 0, 0);
-    }
-    else
-    {
-        m_texture_ptr = SDL_CreateTextureFromSurface(m_renderer_ptr, surface);
-        SDL_FreeSurface(surface);
-    }
-
-    //update texture metadata
-    SDL_QueryTexture(m_texture_ptr, &m_pixel_format, &m_texture_access, &m_width, &m_height);
-}
-
-Texture::Texture(SDL_Texture* texture_ptr, SDL_Renderer* renderer_ptr):  m_width{0}, m_height{0}, m_renderer_ptr{renderer_ptr},  m_texture_ptr{texture_ptr}
-{
-    SDL_QueryTexture(texture_ptr, &m_pixel_format, &m_texture_access, &m_width, &m_height);
-}
-
-// Texture::Texture(SDL_Texture*&& texture_ptr, SDL_Renderer* renderer_ptr): m_width{0}, m_height{0}, m_renderer_ptr{renderer_ptr},  m_texture_ptr{std::move(texture_ptr)}
-// {
-//
-// }
-
-Texture::Texture(SDL_Renderer* renderer_ptr, int width, int height, Uint32 pixel_format, int texture_access): m_width{width},
-    m_height{height}, m_pixel_format{pixel_format}, m_texture_access{texture_access}, m_renderer_ptr{renderer_ptr},  m_texture_ptr{nullptr}
-{
-    m_texture_ptr = SDL_CreateTexture(m_renderer_ptr, m_pixel_format, m_texture_access, m_width, m_height);
-}
+Texture::Texture(SDL_Renderer* renderer_ptr, SDL_Texture* texture_ptr, const std::string& image_path): m_renderer_ptr{renderer_ptr}, m_texture_ptr{texture_ptr},
+    m_colour_modulation{255,255,255,255}, m_blend_mode{SDL_BlendMode::SDL_BLENDMODE_BLEND}, m_image_path{image_path} {}
 
 Texture::~Texture() noexcept
 {
-    SDL_DestroyTexture(m_texture_ptr);
-    m_texture_ptr = nullptr;
-    m_renderer_ptr = nullptr;
+    /* This class does not own the renderer ptr, so DO NOT DELETE IT */
 }
 
-Texture::Texture(Texture&& other) noexcept
-{
-    *this = std::move(other);//will call move operator=, the one bellow
-}
+Texture::Texture(const Texture& other): m_renderer_ptr{other.m_renderer_ptr}, m_texture_ptr{other.m_texture_ptr}, m_colour_modulation{other.m_colour_modulation},
+    m_blend_mode{other.m_blend_mode} ,m_image_path{other.m_image_path} {}
 
-Texture& Texture::operator=(Texture&& other) noexcept
-{
-    //we are moving the object to itself
-    if(this == &other)
-        return *this;
+Texture::Texture(Texture&& other) noexcept : m_renderer_ptr{std::move(other.m_renderer_ptr)}, m_texture_ptr{std::move(other.m_texture_ptr)},
+    m_colour_modulation{std::move(other.m_colour_modulation)}, m_blend_mode{std::move(other.m_blend_mode)}, m_image_path{std::move(other.m_image_path)} {}
 
-    //delete previous texture, if it exists
-    if(this->m_texture_ptr != nullptr)
+Texture& Texture::operator=(const Texture& other)
+{
+    if(this != &other)//not same ref
     {
-        SDL_DestroyTexture(m_texture_ptr);
-        m_texture_ptr = nullptr;
+        Texture tmp(other);
+        *this = std::move(tmp);
     }
-
-    this->m_width = std::move(other.m_width);
-    this->m_height = std::move(other.m_height);
-    this->m_pixel_format = std::move(other.m_pixel_format);
-    this->m_texture_access = std::move(other.m_texture_access);
-
-    this->m_renderer_ptr = std::move(other.m_renderer_ptr);
-    this->m_texture_ptr = std::move(other.m_texture_ptr);
-    this->m_source_path = std::move(other.m_source_path);
 
     return *this;
 }
 
-//Texture Helper Render Functions
-void RenderTexture(SDL_Texture* texture, SDL_Renderer* renderer_ptr, SDL_Rect* source_rect, SDL_Rect* destination_rect)
+Texture& Texture::operator=(Texture&& other) noexcept
 {
-    SDL_RenderCopy(renderer_ptr, texture, source_rect, destination_rect);
-}
-
-bool RenderOnTexture(SDL_Renderer* renderer_ptr, Texture* source_texture, const Texture* destination_texture, SDL_Rect* source_rect, SDL_Rect* destination_rect)
-{
-    if(destination_texture->TextureAccess() == SDL_TEXTUREACCESS_TARGET)//ok, can render to texture
+    if(this != &other)
     {
-        SDL_SetRenderTarget(renderer_ptr, destination_texture->TexturePtr());//set texture as new target
-
-        SDL_RenderCopy(renderer_ptr, source_texture ->TexturePtr(), source_rect, destination_rect);
-
-        SDL_SetRenderTarget(renderer_ptr, nullptr);//reset target to window
-        return true;
+        this->m_renderer_ptr = std::move(other.m_renderer_ptr);
+        this->m_texture_ptr = std::move(other.m_texture_ptr);
+        this->m_colour_modulation = std::move(other.m_colour_modulation);
+        this->m_blend_mode = std::move(other.m_blend_mode);
+        this->m_image_path = std::move(other.m_image_path);
     }
-
-    return false;
+    return *this;
 }
 
-void ResetTextureToTransparency(SDL_Renderer* renderer_ptr, SDL_Texture* texture)
+void Texture::Render(SDL_Rect* src_rect, SDL_Rect* dst_rect)
 {
-    SDL_SetRenderTarget(renderer_ptr, texture);
-    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
-    SDL_SetRenderDrawColor(renderer_ptr, 255, 255, 255, 0);//tranparência
-    SDL_RenderClear(renderer_ptr);
-    SDL_SetRenderTarget(renderer_ptr, nullptr);
+    if(m_texture_ptr == nullptr)
+        return;
+
+    SDL_SetTextureBlendMode(m_texture_ptr, m_blend_mode);
+    SDL_SetTextureAlphaMod(m_texture_ptr, m_colour_modulation.a);
+    SDL_SetTextureColorMod(m_texture_ptr, m_colour_modulation.r, m_colour_modulation.g, m_colour_modulation.b);
+
+    SDL_RenderCopy(m_renderer_ptr, m_texture_ptr, src_rect, dst_rect);
+
+    //we reset the alpha and color modulation after rendering as the texture may be shared
+    SDL_SetTextureColorMod(m_texture_ptr, 255, 255, 255);
+    SDL_SetTextureAlphaMod(m_texture_ptr, 255);
+    SDL_SetTextureBlendMode(m_texture_ptr, SDL_BlendMode::SDL_BLENDMODE_BLEND);
 }
+
+void Texture::RenderEx(SDL_Rect* src_rect, SDL_Rect* dst_rect, double angle, SDL_Point* rotation_pivot, SDL_RendererFlip flip)
+{
+    if(m_texture_ptr == nullptr)
+        return;
+
+    SDL_SetTextureBlendMode(m_texture_ptr, m_blend_mode);
+    SDL_SetTextureAlphaMod(m_texture_ptr, m_colour_modulation.a);
+    SDL_SetTextureColorMod(m_texture_ptr, m_colour_modulation.r, m_colour_modulation.g, m_colour_modulation.b);
+
+    SDL_RenderCopyEx(m_renderer_ptr, m_texture_ptr, src_rect, dst_rect, angle, rotation_pivot, flip);
+
+    //we reset the alpha and color modulation after rendering as the texture may be shared
+    SDL_SetTextureColorMod(m_texture_ptr, 255, 255, 255);
+    SDL_SetTextureAlphaMod(m_texture_ptr, 255);
+    SDL_SetTextureBlendMode(m_texture_ptr, SDL_BlendMode::SDL_BLENDMODE_BLEND);
+}
+
+//<f> Getters/Setters
+void Texture::BlendMode(SDL_BlendMode mode) { m_blend_mode = mode; }
+SDL_BlendMode Texture::BlendMode() const { return m_blend_mode; }
+//</f> /Getters/Setters

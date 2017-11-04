@@ -8,7 +8,7 @@
 class InfluenceWars : public  StateInterface
 {
     public:
-        InfluenceWars(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr);
+        InfluenceWars(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr);
         virtual ~InfluenceWars() noexcept;
         // InfluenceWars(const InfluenceWars& other);
         // InfluenceWars(InfluenceWars&& other) noexcept;
@@ -19,17 +19,19 @@ class InfluenceWars : public  StateInterface
         /**
          * \brief Precess SDL user input
          */
-        virtual void Input(const SDL_Event&);
+        void Input(const SDL_Event&) override;
 
         /**
          * \brief Process any logic, runs after input
          */
-        virtual void Logic(float delta_time = 1);
+        void Logic(float delta_time = 1) override;
+
+        void FixedLogic(float fixed_delta_time) override {}
 
         /**
          * \brief Render the state visual elements
          */
-        virtual void Render(SDL_Renderer*, float delta_time);
+        void Render(SDL_Renderer*, float delta_time) override;
 
     private:
         std::vector<InfluenceCell> m_map;

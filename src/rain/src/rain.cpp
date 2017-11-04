@@ -1,17 +1,17 @@
 #include "rain.hpp"
 #include <iostream>
+#include "object.hpp"
+#include "image.hpp"
+#include "constants.hpp"
+#include "collider.hpp"
+#include "utils.hpp"
+#include "basic_frame_animation.hpp"
+#include "mask.hpp"
+#include "light.hpp"
+#include "random.hpp"
 
-Rain::Rain(StateMachine* state_machine, const std::string& state_name, SDL_Renderer* renderer_ptr, sdl_gui::ResourceManager* resource_manager_ptr):StateInterface(state_machine, state_name, resource_manager_ptr)
-{
-    m_bg_colour = Colour::Storm_Petrel;
-    m_drop_sound = Mix_LoadWAV("data/sfx/drop.wav");
-    m_mute = true;
-
-    for(int i{0}; i < drop_count; ++i)
-    {
-        m_drops.push_back(Drop{ std::bind(&Rain::PlayDropSound, this) });
-    }
-}
+Rain::Rain(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):
+    StateInterface(state_machine, state_name, system_manager_ptr) { }
 
 void Rain::Input(const SDL_Event& event)
 {
@@ -20,38 +20,104 @@ void Rain::Input(const SDL_Event& event)
         switch(event.key.keysym.sym)
         {
             case SDLK_ESCAPE: m_state_machine_ptr->ChangeState(StateName::Menu); break;
-            case SDLK_1: m_state_machine_ptr->ChangeState(StateName::Snake); break;
             case SDLK_m: m_mute = !m_mute; if(m_mute) Mix_Volume(1, 0); else Mix_Volume(1, MIX_MAX_VOLUME); break;
-            // case SDLK_f:
-            // fullscreen = !fullscreen;
-            //
-            // if(fullscreen)
-            //     SDL_SetWindowFullscreen(window.get(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-            // else
-            //     SDL_SetWindowFullscreen(window.get(), 0);
-            // break;
+            case SDLK_s: m_mask->Enabled( !m_mask->Enabled() ); break;
         }
     }
 }
 
+void Rain::FixedLogic(float fixed_delta_time) { }
+
 void Rain::Logic(float delta_time)
 {
-    //Logic and Render being called in separate moments causes the repetition os the loop
-    for(Drop& d : m_drops)
+    m_current_wind_duration += delta_time;
+
+    if(m_current_wind_duration >= m_wind_duration)//calculate new wind force
     {
-        d.Logic(delta_time);
+        m_current_wind_duration = 0;
+
+        float wind_x{Random( -c_max_wind_x_force, c_max_wind_x_force )};
+        float wind_y{Random( 0.f, 30.f )};
+        // float wind_z{Random( -1.f, 1.f ) };
+
+        m_wind = {wind_x, wind_y, 0};
+
+        //new wind duration
+        m_wind_duration = Random(3.f, 10.f);
     }
+
+    for(auto & drop : m_drops)
+        drop->ChangeWindForce(m_wind);
 }
 
-void Rain::Render(SDL_Renderer* renderer, float delta_time)
-{
-    SDL_SetRenderDrawColor( renderer, m_bg_colour.r, m_bg_colour.g, m_bg_colour.b, m_bg_colour.a );
-    SDL_RenderClear( renderer );
+void Rain::Render(SDL_Renderer* renderer, float delta_time) { }
 
-    for(Drop& d : m_drops)
+void Rain::Enter()
+{
+    //BG
+    auto bg_object{m_system_manager_ptr->Objects()->CreateObject()};
+    bg_object->TransformPtr()->LocalPosition({window_centre_x, window_centre_y, 0});
+    bg_object->TransformPtr()->LocalScale({window_width, window_height, 0});
+    auto bg_image{ new Image(m_system_manager_ptr) };
+    bg_image->ColourModulation(Colour::Storm_Petrel);
+    bg_object->AddScript(bg_image);
+    bg_object->TransformPtr()->LocalPositionZ(500);
+
+    //floor Collider
+    // auto floor_object{m_system_manager_ptr->Objects()->CreateObject()};
+    // floor_object->AddScript( new Collider() );
+    // floor_object->TransformPtr()->LocalScale({window_width, 300, 1});
+    // floor_object->TransformPtr()->LocalPosition({0, window_height, 0});
+    // floor_object->AddTag("floor");
+    // auto floor_collider{new Collider()};
+    // floor_object->AddScript(floor_collider);
+    // m_system_manager_ptr->Colliders()->AddCollider(floor_collider);
+
+    //create drops
+    for(auto i{0}; i<drop_count; ++i)
     {
-        d.Render(renderer, delta_time);
+        auto drop{m_system_manager_ptr->Objects()->CreateObject()};
+        auto drop_image{new Image(m_system_manager_ptr)};
+        drop->AddScript(drop_image);
+
+        auto drop_script{new Drop(m_system_manager_ptr)};
+        drop->AddScript(drop_script);
+
+        // auto drop_collider{new Collider()};
+        // drop->AddScript(drop_collider);
+        // drop_collider->OnCollision = std::bind(&Drop::DropHit, drop_script, std::placeholders::_1);
+        // m_system_manager_ptr->Colliders()->AddCollider(drop_collider);
+
+        drop_script->ResetDrop();
+        m_drops.push_back(drop_script);
     }
+
+    m_drop_sound = Mix_LoadWAV("data/sfx/drop.wav");
+    m_mute = true;
+
+
+    m_mask = m_system_manager_ptr->Objects()->CreateObject();
+    auto mask_script{new Mask{m_system_manager_ptr}};
+    m_mask->AddScript(mask_script);
+    m_mask->TransformPtr()->LocalPosition({50,50,-1});
+
+    //mask image decal
+    auto mask_image{new Image{m_system_manager_ptr}};
+    m_mask->AddScript(mask_image);
+    mask_image->SetImage("data/img/light.png");
+    m_mask->TransformPtr()->LocalScale({700,700,1});
+    mask_script->SetImage(mask_image);
+    mask_image->Disable();
+
+    auto light_script{new Light{}};
+    m_mask->AddScript(light_script);
+
+    SDL_WarpMouseInWindow(m_system_manager_ptr->Window(), window_centre_x, window_centre_y);
+}
+
+void Rain::Exit()
+{
+    m_system_manager_ptr->Clear();
 }
 
 void Rain::PlayDropSound()

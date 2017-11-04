@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 #include "SDL.h"
-#include <sdl_gui_resource_manager.hpp>
+#include "system_manager.hpp"
 
 #include "state_interface.hpp"
 //class ResourceManager;
@@ -16,7 +16,7 @@ class StateInterface;
 class StateMachine
 {
     public:
-        StateMachine(SDL_Renderer* renderer, sdl_gui::ResourceManager* resource_manager_ptr, bool* quit_flag);
+        StateMachine(SystemManager* system_manager_ptr, bool* quit_flag);
         virtual ~StateMachine();
 
         /**
@@ -55,8 +55,7 @@ class StateMachine
         /**
          * \brief Just a shortcut for the resource manager owned renderer
          */
-        SDL_Renderer* m_renderer_ptr;
-        sdl_gui::ResourceManager* m_resource_manager_ptr;
+        SystemManager* m_system_manager_ptr;
 
         std::unique_ptr<StateInterface> m_current_state;
         std::unique_ptr<StateInterface> m_previous_state;

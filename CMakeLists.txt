@@ -2,9 +2,10 @@ cmake_minimum_required(VERSION 3.8.2)
 
 #project name and cpp standard (c++11)
 project("CMake Test" CXX)
-set(CMAKE_CXX_STANDARD 11)
+# set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 add_compile_options(-g)
-set(app_name "genericSDL")
+set(app_name "generic")
 
 #include_directories(src)#will search inside all directories inside src
 add_subdirectory(src)
@@ -42,9 +43,12 @@ include_directories(${SDL2_MIXER_INCLUDE_DIR})
 #SDL2 net
 #find_package(SDL2_net REQUIRED)
 #include_directories(${SDL2_NET_INCLUDE_DIR})
+#Lua
+find_package(Lua REQUIRED)
+include_directories(${LUA_INCLUDE_DIR})
 
 add_executable(${app_name} ${SOURCE_FILES} ${HEADER_FILES})
-target_link_libraries(${app_name} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY})
+target_link_libraries(${app_name} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} ${LUA_LIBRARY})
 
 #copy contents of root folder "data" to folder "data" next to executable, if build is succeeds(POST_BUILD)
 add_custom_command(TARGET ${app_name} POST_BUILD
