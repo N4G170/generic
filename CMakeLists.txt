@@ -40,14 +40,14 @@ include_directories(${SDL2_TTF_INCLUDE_DIR})
 #SDL2 mixer
 find_package(SDL2_mixer REQUIRED)
 include_directories(${SDL2_MIXER_INCLUDE_DIR})
-#SDL2 net
-#find_package(SDL2_net REQUIRED)
-#include_directories(${SDL2_NET_INCLUDE_DIR})
 #Lua
 find_package(Lua REQUIRED)
 include_directories(${LUA_INCLUDE_DIR})
 
 add_executable(${app_name} ${SOURCE_FILES} ${HEADER_FILES})
+
+set_target_properties(${app_name} PROPERTIES LINK_FLAGS "-Wl,-rpath,./data/lib")#add local folder as relative path
+
 target_link_libraries(${app_name} ${SDL2_LIBRARY} ${SDL2_IMAGE_LIBRARY} ${SDL2_TTF_LIBRARY} ${SDL2_MIXER_LIBRARY} ${LUA_LIBRARY})
 
 #copy contents of root folder "data" to folder "data" next to executable, if build is succeeds(POST_BUILD)

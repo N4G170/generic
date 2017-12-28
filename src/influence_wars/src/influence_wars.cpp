@@ -9,6 +9,8 @@
 #include "SDL.h"
 
 #include "graph.hpp"
+#include "image.hpp"
+#include "object.hpp"
 
 int map_width{130};
 int map_height{80};
@@ -25,21 +27,21 @@ SDL_Texture* texture2 = nullptr;
 PerlinNoise noise_obj(15);
 PerlinNoise2 noise_obj2;
 
-int o = 1;
-int p = std::pow(2,o);
+// int o = 1;
+// int p = std::pow(2,o);
 
 void Draw(SDL_Renderer* renderer)
 {
     surface = SDL_CreateRGBSurface(0, map_width, map_height, 32, 0,0,0,255);
     surface2 = SDL_CreateRGBSurface(0, map_width2, map_height2, 32, 0,0,0,255);
 
-    double max = -10;
-    double min = 10;
-    double max2 = -10;
-    double min2 = 10;
+    // double max = -10;
+    // double min = 10;
+    // double max2 = -10;
+    // double min2 = 10;
 
-int e1=0; int e2=0;
-PerlinNoise noise_obj_e1(Random(0,256));
+    // int e1=0; int e2=0;
+    PerlinNoise noise_obj_e1(Random(0,256));
     Uint32* pixels = static_cast<Uint32*>(surface->pixels);
     for(int i{0}; i < map_width*map_height; ++i)
     {
@@ -47,7 +49,7 @@ PerlinNoise noise_obj_e1(Random(0,256));
         int y = i / map_width;
         // double noise = noise_obj2.noise(static_cast<double>(x) / map_width, static_cast<double>(y) / map_height,0);
         double noise{0};
-        double noise2{0};
+        // double noise2{0};
         // noise2 = (noise_obj_e1.Noise(static_cast<double>(x) / map_width, static_cast<double>(y) / map_height,0) + 1) / 2;
         // //noise_obj.Seed(Random(0,256));
         // noise += (noise_obj_e2.Noise(static_cast<double>(x) / map_width, static_cast<double>(y) / map_height,0) + 1) / 2 * 0.3;
@@ -58,10 +60,11 @@ PerlinNoise noise_obj_e1(Random(0,256));
         // noise = noise_obj.OctaveNoise(static_cast<double>(x) / map_width / p + noise2, static_cast<double>(y) / map_height / p + noise2, 0, o, p);
 
         SDL_Colour c;
-        if(noise<0){
-            ++e1;
+        if(noise<0)
+        {
+            // ++e1;
             c.r = 0, c.g = 255, c.b = 0, c.a = 255;
-            std::cout << noise <<" - "<<static_cast<double>(x)<<" - "<<(static_cast<double>(x) / map_width)<<" - "<<static_cast<double>(y)<<" - "<<(static_cast<double>(y) / map_width)<< "\n";
+            // std::cout << noise <<" - "<<static_cast<double>(x)<<" - "<<(static_cast<double>(x) / map_width)<<" - "<<static_cast<double>(y)<<" - "<<(static_cast<double>(y) / map_width)<< "\n";
         }
         else if(noise <= 0.1) { c.r = 110, c.g = 139, c.b = 61, c.a = 255; }//DarkOliveGreen4
         else if(noise <= 0.2) { c.r = 189, c.g = 183, c.b = 107, c.a = 255; }//DarkKhaki
@@ -74,7 +77,7 @@ PerlinNoise noise_obj_e1(Random(0,256));
         else if(noise <= 0.9) { c.r = 34, c.g = 34, c.b = 34, c.a = 255; }//even darker grey
         else if(noise <= 1.0) { c.r = 245, c.g = 255, c.b = 250, c.a = 255; }//MintCream
         else if(noise<1.0){
-            ++e2;
+            // ++e2;
             c.r = 255, c.g = 0, c.b = 0, c.a = 255;
             std::cout << noise << "\n";
         }
@@ -144,8 +147,8 @@ void InfluenceWars::Input(const SDL_Event& event)
         {
             case SDLK_ESCAPE: m_state_machine_ptr->ChangeState(StateName::Menu); break;
             case SDLK_r: reload=true; break;
-            case SDLK_KP_MINUS: o = (o-1 <= 0)?1:o-1; p = std::pow(2,o); break;
-            case SDLK_KP_PLUS: o = (o+1 >= 9)?8:o+1; p = std::pow(2,o); break;
+            // case SDLK_KP_MINUS: o = (o-1 <= 0)?1:o-1; p = std::pow(2,o); break;
+            // case SDLK_KP_PLUS: o = (o+1 >= 9)?8:o+1; p = std::pow(2,o); break;
         }
     }
 }
@@ -160,13 +163,13 @@ void InfluenceWars::Render(SDL_Renderer* renderer, float delta_time)
     // for(auto& cell : m_map)
     //     cell.Render(renderer);
 
-if(reload)
-{
-    reload = false;
-    noise_obj.Seed(Random(0,512));
-    Draw(renderer);
-    std::cout << o << "\n";
-}
+    if(reload)
+    {
+        reload = false;
+        noise_obj.Seed(Random(0,512));
+        Draw(renderer);
+        // std::cout << o << "\n";
+    }
 
     SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_ADD);
     SDL_Rect rect{map_offset, map_offset, map_width*10, map_height*10};
@@ -174,4 +177,19 @@ if(reload)
     // SDL_Rect rect2{map_width*20 + map_offset*2, map_offset, map_width2*20, map_height2*20};
     // SDL_RenderCopy(renderer, texture2, NULL, &rect2);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BlendMode::SDL_BLENDMODE_NONE);
+}
+
+void InfluenceWars::Enter()
+{
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/perlin_menu.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({600,50,0});
+    menu_obj->TransformPtr()->LocalPosition({305,30,0});
+}
+
+void InfluenceWars::Exit()
+{
+    m_system_manager_ptr->Clear();
 }

@@ -34,6 +34,9 @@ class SnakeGame : public StateInterface
          */
         void Render(SDL_Renderer*, float delta_time) override;
 
+        void Enter() override;
+        void Exit() override;
+
     private:
         std::array< std::array<short, snake_grid_size>, snake_grid_size > m_grid;
         std::vector<Point> m_snake;

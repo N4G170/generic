@@ -113,6 +113,13 @@ void Rain::Enter()
     m_mask->AddScript(light_script);
 
     SDL_WarpMouseInWindow(m_system_manager_ptr->Window(), window_centre_x, window_centre_y);
+
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/rain_menu.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({300,100,0});
+    menu_obj->TransformPtr()->LocalPosition({155,55,-2});
 }
 
 void Rain::Exit()

@@ -83,6 +83,13 @@ void SolarSystem::Render(SDL_Renderer* renderer, float delta_time)
 
 void SolarSystem::Enter()
 {
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/back_to_main.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({300,100,0});
+    menu_obj->TransformPtr()->LocalPosition({155,55,0});
+
     //<f> Background Image
     auto bg_obj{m_system_manager_ptr->Objects()->CreateObject()};
     auto bg_image{ new Image{m_system_manager_ptr} };

@@ -44,6 +44,13 @@ void MapDemo::Enter()
     auto m_map_script{ new Map{m_system_manager_ptr}};
     map_obj->AddScript(m_map_script);
     m_map_script->BuildMap();
+
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/back_to_main.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({300,100,0});
+    menu_obj->TransformPtr()->LocalPosition({155,55,0});
 }
 void MapDemo::Exit()
 {

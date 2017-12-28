@@ -84,6 +84,13 @@ void ParticleState::Enter()
     m_emitter = new ParticleEmitter{m_system_manager_ptr};
     emitter_obj->AddScript(m_emitter);
     m_emitter->CreateParticle();
+
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/particles_menu.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({300,100,0});
+    menu_obj->TransformPtr()->LocalPosition({155,55,-2});
 }
 
 void ParticleState::Exit()

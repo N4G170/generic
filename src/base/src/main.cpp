@@ -144,13 +144,6 @@ int main(int argc, char *argv[])
         float fixed_frame_time {0.03};
         float accumulated_time {0};
 
-        // bool in{false};
-        // bool in2{false};
-        // sdl_gui::Label(renderer.get(), "data/font/DejaVuSansMono.ttf", 16, "Off", Colour::Green, 150, 50, -1, -1);
-        // SDL_Rect col{200, 200, 150, 50};
-        // sdl_gui::GuiCollider collider(col);
-        // sdl_gui::GuiCollider collider2(300, 300, 25);
-
         //main loop
         while(!quit)
         {
@@ -173,15 +166,7 @@ int main(int argc, char *argv[])
                 {
                     switch(event.key.keysym.sym)
                     {
-                        // case SDLK_ESCAPE: quit = true; break;
-                        // case SDLK_f:
-                        // fullscreen = !fullscreen;
-                        //
-                        // if(fullscreen)
-                        //     SDL_SetWindowFullscreen(window.get(), SDL_WINDOW_FULLSCREEN_DESKTOP);
-                        // else
-                        //     SDL_SetWindowFullscreen(window.get(), 0);
-                        // break;
+
                     }
                 }
 
@@ -206,7 +191,7 @@ int main(int argc, char *argv[])
             SDL_RenderClear( renderer.get() );
 
 			system_manager.Render(last_frame_time);
-			state_machine.Render(last_frame_time);
+            state_machine.Render(last_frame_time);
 
 			//Update screen
 			SDL_RenderPresent( renderer.get() );

@@ -33,6 +33,9 @@ class InfluenceWars : public  StateInterface
          */
         void Render(SDL_Renderer*, float delta_time) override;
 
+        void Enter() override;
+        void Exit() override;
+
     private:
         std::vector<InfluenceCell> m_map;
 

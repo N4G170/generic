@@ -1,18 +1,20 @@
 #include "menu.hpp"
 #include "constants.hpp"
 #include <iostream>
+#include "object.hpp"
+#include "image.hpp"
 
 SDL_Colour bg{12,34,56,255};
 
 Menu::Menu(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):
     StateInterface(state_machine, state_name, system_manager_ptr)
 {
-    std::cout<<"<b>1</b> - A* Grid Map"<<std::endl;
-    std::cout<<"<b>2</b> - Rain demo"<<std::endl;
-    std::cout<<"<b>3</b> - Snake Game demo"<<std::endl;
-    std::cout<<"<b>4</b> - Solar System demo"<<std::endl;
-    std::cout<<"<b>5</b> - Influence Wars"<<std::endl;
-    std::cout<<"<b>6</b> - Particles"<<std::endl;
+    // std::cout<<"<b>1</b> - A* Grid Map"<<std::endl;
+    // std::cout<<"<b>2</b> - Rain demo"<<std::endl;
+    // std::cout<<"<b>3</b> - Snake Game demo"<<std::endl;
+    // std::cout<<"<b>4</b> - Solar System demo"<<std::endl;
+    // std::cout<<"<b>5</b> - Influence Wars"<<std::endl;
+    // std::cout<<"<b>6</b> - Particles"<<std::endl;
 }
 
 Menu::~Menu()
@@ -37,9 +39,6 @@ void Menu::Input(const SDL_Event& event)
     }
 }
 
-bool u{false};
-float t{0};
-
 void Menu::Logic(float delta_time)
 {
 
@@ -47,26 +46,32 @@ void Menu::Logic(float delta_time)
 
 void Menu::Render(SDL_Renderer* renderer, float delta_time)
 {
-    // SDL_SetRenderDrawColor( renderer, Colour::Grey.r, Colour::Grey.g, Colour::Grey.b, Colour::Grey.a );
-    SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a );
-    SDL_RenderClear( renderer );
+    // // SDL_SetRenderDrawColor( renderer, Colour::Grey.r, Colour::Grey.g, Colour::Grey.b, Colour::Grey.a );
+    // SDL_SetRenderDrawColor( renderer, bg.r, bg.g, bg.b, bg.a );
+    // SDL_RenderClear( renderer );
+    //
+    // SDL_SetRenderDrawColor( renderer, Colour::Storm_Petrel.r, Colour::Storm_Petrel.g, Colour::Storm_Petrel.b, 128);
+    // // SDL_SetRenderDrawColor( renderer, 128,255,255,255);
+    // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    // SDL_Rect aux_rect{10,10,200,100};
+    // SDL_RenderFillRect(renderer, &aux_rect);
+    // SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 
-    SDL_SetRenderDrawColor( renderer, Colour::Storm_Petrel.r, Colour::Storm_Petrel.g, Colour::Storm_Petrel.b, 128);
-    // SDL_SetRenderDrawColor( renderer, 128,255,255,255);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_Rect aux_rect{10,10,200,100};
-    SDL_RenderFillRect(renderer, &aux_rect);
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 }
 
 void Menu::Enter()
 {
-
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/main_menu.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({800,600,0});
+    menu_obj->TransformPtr()->LocalPosition({window_centre_x, window_centre_y, 0});
 }
 
 void Menu::Exit()
 {
-
+    m_system_manager_ptr->Clear();
 }
 
 void Menu::ChangeStateCallback(const std::string &state)

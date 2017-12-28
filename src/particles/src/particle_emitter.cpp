@@ -56,7 +56,10 @@ Script* ParticleEmitter::Clone() { return new ParticleEmitter{*this}; }
 //<f> Particle Control
 void ParticleEmitter::CreateParticle()
 {
-    for(auto i{0}; i<250; ++i)
+    float base_angle{Random(0.f, 360.f)};
+    float spread{Random(20.f, 30.f)};
+    int num_of_particles{Random(250,500)};
+    for(auto i{0}; i<num_of_particles; ++i)
     {
         auto particle_obj{m_system_manager->Objects()->CreateObject()};
         auto particle_img{new Image(m_system_manager)};
@@ -64,7 +67,8 @@ void ParticleEmitter::CreateParticle()
 
         // int img_index{Random(0,8)};
         // particle_img->SetImage("data/img/Explosion/explosion0"+std::to_string(img_index)+".png");
-        particle_img->ColourModulation({128,0,0,255});
+        // particle_img->ColourModulation({128,0,0,255});
+        particle_img->ColourModulation({(Uint8)Random(128,255),0,0,255});
 
         particle_obj->TransformPtr()->LocalPosition({window_centre_x, window_centre_y, 0});
         particle_obj->TransformPtr()->LocalScale({5,5,0});
@@ -74,7 +78,8 @@ void ParticleEmitter::CreateParticle()
         particle_obj->AddScript(particle_script);
 
         float rotation{Random(1.f, 15.f)};
-        auto angle{ DegreesToRadians(Random(90-25.f + 180, 90+25.f + 180)) };
+        auto angle{ DegreesToRadians(Random(base_angle-spread, base_angle+spread)) };
+        // auto angle{ DegreesToRadians(Random(90-25.f + 180, 90+25.f + 180)) };
         Vector3<float> direction{ std::cos(angle), std::sin(angle), 0};
         // Vector3<float> direction{ Random(-1.f, 1.f), Random(-1.f, 1.f), 0};
         float velocity{Random(1.f, 10.f) * 5};

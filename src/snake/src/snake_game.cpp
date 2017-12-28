@@ -1,6 +1,7 @@
 #include "snake_game.hpp"
 #include "random.hpp"
 #include <iostream>
+#include "image.hpp"
 
 SnakeGame::SnakeGame(StateMachine* state_machine, const std::string& state_name, SystemManager* system_manager_ptr):
     StateInterface(state_machine, state_name, system_manager_ptr)
@@ -108,8 +109,8 @@ void SnakeGame::Logic(float delta_time)
 
 void SnakeGame::Render(SDL_Renderer* renderer, float delta_time)
 {
-    SDL_SetRenderDrawColor( renderer, Colour::Black.r, Colour::Black.g, Colour::Black.b, Colour::Black.a );
-    SDL_RenderClear( renderer );
+    // SDL_SetRenderDrawColor( renderer, Colour::Black.r, Colour::Black.g, Colour::Black.b, Colour::Black.a );
+    // SDL_RenderClear( renderer );
 
     SDL_SetRenderDrawColor( renderer, Colour::Cyan.r, Colour::Cyan.g, Colour::Cyan.b, Colour::Cyan.a );
     for(int i{0}; i < snake_grid_size; ++i)
@@ -178,4 +179,19 @@ void SnakeGame::ResetGame()
             m_grid[i][j] = 0;
 
     CreateFood();
+}
+
+void SnakeGame::Enter()
+{
+    auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
+    auto menu_image{ new Image{m_system_manager_ptr} };
+    menu_image->SetImage("data/img/snake_menu.png");
+    menu_obj->AddScript(menu_image);
+    menu_obj->TransformPtr()->LocalScale({300,150,0});
+    menu_obj->TransformPtr()->LocalPosition({155,80,-2});
+}
+
+void SnakeGame::Exit()
+{
+    m_system_manager_ptr->Clear();
 }
