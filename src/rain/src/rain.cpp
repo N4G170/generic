@@ -57,7 +57,7 @@ void Rain::Enter()
     //BG
     auto bg_object{m_system_manager_ptr->Objects()->CreateObject()};
     bg_object->TransformPtr()->LocalPosition({window_centre_x, window_centre_y, 0});
-    bg_object->TransformPtr()->LocalScale({window_width, window_height, 0});
+    bg_object->TransformPtr()->LocalScale({static_cast<float>(window_width), static_cast<float>(window_height), 0});
     auto bg_image{ new Image(m_system_manager_ptr) };
     bg_image->ColourModulation(Colour::Storm_Petrel);
     bg_object->AddScript(bg_image);
@@ -112,7 +112,7 @@ void Rain::Enter()
     auto light_script{new Light{}};
     m_mask->AddScript(light_script);
 
-    SDL_WarpMouseInWindow(m_system_manager_ptr->Window(), window_centre_x, window_centre_y);
+    SDL_WarpMouseInWindow(m_system_manager_ptr->Window(), (int)(window_centre_x), (int)(window_centre_y));
 
     auto menu_obj{m_system_manager_ptr->Objects()->CreateObject()};
     auto menu_image{ new Image{m_system_manager_ptr} };

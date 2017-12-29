@@ -95,7 +95,7 @@ void SolarSystem::Enter()
     auto bg_image{ new Image{m_system_manager_ptr} };
     bg_obj->AddScript(bg_image);
     bg_obj->TransformPtr()->LocalPosition({window_centre_x, window_centre_y, 10});
-    bg_obj->TransformPtr()->LocalScale({window_width, window_height, 0});
+    bg_obj->TransformPtr()->LocalScale({static_cast<float>(window_width), static_cast<float>(window_height), 0});
     bg_image->ColourModulation({0,0,0,255});
     //</f> /Background Image
 

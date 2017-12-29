@@ -66,7 +66,7 @@ void Comet::Update(float delta_time)
     m_owner->TransformPtr()->LocalPosition(position);
 
     //check if inside window
-    if(RectCollision(position, m_owner->TransformPtr()->LocalScale(), {0,0,0}, {window_width, window_height, 0}))
+    if(RectCollision(position, m_owner->TransformPtr()->LocalScale(), {0,0,0}, {static_cast<float>(window_width), static_cast<float>(window_height), 0}))
     {
         m_can_reset = true;
     }

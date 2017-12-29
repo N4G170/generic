@@ -43,6 +43,8 @@ struct BasicFrame
     std::string image_path{};
     bool has_src_rect{false};
     SDL_Rect source_rect{0,0,0,0};
+
+    BasicFrame(const std::string& path, bool has_rect, const SDL_Rect& src_rect) : image_path{path}, has_src_rect{has_rect}, source_rect{src_rect} {}
 };
 
 #endif //STRUCTS_HPP

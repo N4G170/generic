@@ -22,6 +22,8 @@ struct Neightbour
      * \brief Cost of moving to neighbour. Precalculated because of diagonals
      */
     float cost{0};
+
+    Neightbour(int i, float c): index{i}, cost{c}{}
 };
 
 //<f> Heuristics
@@ -139,7 +141,7 @@ std::queue<Neightbour> GetNeighbors(const int& current_index, const int& map_wid
     has_se = has_south && has_east;
     has_sw = has_south && has_west;
 
-    float diagonal_modifier{1.4142135623730950488};
+    float diagonal_modifier{1.4142135623730950488f};
 
     if(has_ne && IsPassable(current_node_x + 1, current_node_y - 1,  map_width, map_height, map))
     {

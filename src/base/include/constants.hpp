@@ -5,14 +5,15 @@
 #include "SDL.h"
 #include <cmath>
 
-constexpr float SquareRoot(float number)
+// constexpr float SquareRoot(float number)//TODO
+inline float SquareRoot(float number)
 {
     return std::sqrt(number);
 }
 
 namespace Math
 {
-    const float PI{3.14159265358979};
+    const float PI{3.14159265358979f};
 }
 
 namespace Colour
@@ -38,8 +39,8 @@ namespace Colour
 const std::string window_name {"Random SDL stuff"};
 const int window_width {1760};
 const int window_height {990};
-const int window_centre_x {(window_width/2)};
-const int window_centre_y {(window_height/2)};
+const float window_centre_x {(window_width/2)};
+const float window_centre_y {(window_height/2)};
 const std::string font_path {"data/font/DejaVuSansMono.ttf"};
 const int font_size {14};
 

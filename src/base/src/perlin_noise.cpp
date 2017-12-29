@@ -1,5 +1,5 @@
 #include "perlin_noise.hpp"
-//#include <numeric>
+#include <numeric>
 #include <algorithm>
 //#include "utils.hpp"
 
