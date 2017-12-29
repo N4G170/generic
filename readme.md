@@ -12,13 +12,13 @@ With new new system, I scrapped my old parent-children transform system, as the 
 
 The ECS system currently can render images, basic frame animations (based on images), apply masks, render on canvas(something, like viewports) and detect collisions (there is, also, the beginning of a basic particle emitter/system).
 
-Currently the program has 6 demos.
-    - The first is a simulation of creatures moving on a map, using A* pathfinding, with no corner cut and with different move costs. This demo uses the ECS.
-    - The second is a "rain" demo, basically rain falls, there is wind, each drop when it hits the floor it disappear and a splash animation is run. The is also a mask applied to the scene to simulate the night and the use of a flashlight (can be disabled). This demo uses the ECS, the mask was created for this demo.
-    - The third is the oldest demo in the project, a very basic snake, I don't even remember why I made it. Does not use the ECS, and I will keep it like that as a "souvenir"
-    - The fourth, the solar system demo, the ECS was mainly created using this demo, it simulates a small solar system with planet, moons, a sun and comets flying around. Each planet and the sun have gravity that attracts comets to it. I really enjoyed making this simulation, and when I finish the vulkan renderer this will be the first thing I'll port to it.
-    - The fifth generates a map with perlin noise. I made it because I was curious about the process. It needs to be converted to the ECS and requires a lot of cleaning.
-    - The sixth contains the base for the basic particle emitter. Currently, as it is in testing, it "shoots" is a V with varying amplitude and direction.
+####Currently the program has 6 demos.
+- The first is a simulation of creatures moving on a map, using A* pathfinding, with no corner cut and with different move costs. This demo uses the ECS.
+- The second is a "rain" demo, basically rain falls, there is wind, each drop when it hits the floor it disappear and a splash animation is run. The is also a mask applied to the scene to simulate the night and the use of a flashlight (can be disabled). This demo uses the ECS, the mask was created for this demo.
+- The third is the oldest demo in the project, a very basic snake, I don't even remember why I made it. Does not use the ECS, and I will keep it like that as a "souvenir"
+- The fourth, the solar system demo, the ECS was mainly created using this demo, it simulates a small solar system with planet, moons, a sun and comets flying around. Each planet and the sun have gravity that attracts comets to it. I really enjoyed making this simulation, and when I finish the vulkan renderer this will be the first thing I'll port to it.
+- The fifth generates a map with perlin noise. I made it because I was curious about the process. It needs to be converted to the ECS and requires a lot of cleaning.
+- The sixth contains the base for the basic particle emitter. Currently, as it is in testing, it "shoots" is a V with varying amplitude and direction.
 
 
 ## Running the program
@@ -32,19 +32,19 @@ So, to use the program, just follow the text.
 ### If on Linux
 
 First install all the dependencies:
-    - SDL2
-    - SDL2_image
-    - SDL2_ttf
-    - SDL2_mixer
-    - lua
-    - cmake (needed for "fast" build)
+- SDL2
+- SDL2_image
+- SDL2_ttf
+- SDL2_mixer
+- lua
+- cmake (needed for "fast" build)
 After that, open terminal window at the base of the project (the folder with this file) and run the commands:
-    ```
-    - mkdir build
-    - cd build
-    - cmake ..
-    - make -j
-    ```
+```
+- mkdir build
+- cd build
+- cmake ..
+- make -j
+```
 If no errors appear, the build is complete and you can run the program with the command ./generic
 I did not configure any install instructions, so if you want to move the build, copy the folder 'data' and the file 'generic' from the build folder.
 
