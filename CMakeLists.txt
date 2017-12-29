@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.8.2)
 project("CMake Test" CXX)
 # set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
-add_compile_options(-g)
+# add_compile_options(-g)
 set(app_name "generic")
 
 #include_directories(src)#will search inside all directories inside src

@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4927C85E-5BF1-4918-A76B-8B28A7F8E3F0}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>generic</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\lua\include;C:\Users\vm\Desktop\sources\generic\vs\dependencies\include;C:\Users\vm\Desktop\sources\generic\src\solar\include;C:\Users\vm\Desktop\sources\generic\src\snake\include;C:\Users\vm\Desktop\sources\generic\src\rain\include;C:\Users\vm\Desktop\sources\generic\src\particles\include;C:\Users\vm\Desktop\sources\generic\src\other\include;C:\Users\vm\Desktop\sources\generic\src\influence_wars\include;C:\Users\vm\Desktop\sources\generic\src\base\include;C:\Users\vm\Desktop\sources\generic\src\base\include\scripts;C:\Users\vm\Desktop\sources\generic\src\base\include\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\include;$(IncludePath)</IncludePath>
+    <SourcePath>C:\Users\vm\Desktop\sources\generic\src\solar\src;C:\Users\vm\Desktop\sources\generic\src\snake\src;C:\Users\vm\Desktop\sources\generic\src\rain\src;C:\Users\vm\Desktop\sources\generic\src\particles\src;C:\Users\vm\Desktop\sources\generic\src\influence_wars\src;C:\Users\vm\Desktop\sources\generic\src\base\src;C:\Users\vm\Desktop\sources\generic\src\base\src\scripts;C:\Users\vm\Desktop\sources\generic\src\base\src\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\src;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\libs;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\lua\include;C:\Users\vm\Desktop\sources\generic\vs\dependencies\include;C:\Users\vm\Desktop\sources\generic\src\solar\include;C:\Users\vm\Desktop\sources\generic\src\snake\include;C:\Users\vm\Desktop\sources\generic\src\rain\include;C:\Users\vm\Desktop\sources\generic\src\particles\include;C:\Users\vm\Desktop\sources\generic\src\other\include;C:\Users\vm\Desktop\sources\generic\src\influence_wars\include;C:\Users\vm\Desktop\sources\generic\src\base\include;C:\Users\vm\Desktop\sources\generic\src\base\include\scripts;C:\Users\vm\Desktop\sources\generic\src\base\include\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\include;$(IncludePath)</IncludePath>
+    <SourcePath>C:\Users\vm\Desktop\sources\generic\src\solar\src;C:\Users\vm\Desktop\sources\generic\src\snake\src;C:\Users\vm\Desktop\sources\generic\src\rain\src;C:\Users\vm\Desktop\sources\generic\src\particles\src;C:\Users\vm\Desktop\sources\generic\src\influence_wars\src;C:\Users\vm\Desktop\sources\generic\src\base\src;C:\Users\vm\Desktop\sources\generic\src\base\src\scripts;C:\Users\vm\Desktop\sources\generic\src\base\src\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\src;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\libs;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\lua\include;C:\Users\vm\Desktop\sources\generic\vs\dependencies\include;C:\Users\vm\Desktop\sources\generic\src\solar\include;C:\Users\vm\Desktop\sources\generic\src\snake\include;C:\Users\vm\Desktop\sources\generic\src\rain\include;C:\Users\vm\Desktop\sources\generic\src\particles\include;C:\Users\vm\Desktop\sources\generic\src\other\include;C:\Users\vm\Desktop\sources\generic\src\influence_wars\include;C:\Users\vm\Desktop\sources\generic\src\base\include;C:\Users\vm\Desktop\sources\generic\src\base\include\scripts;C:\Users\vm\Desktop\sources\generic\src\base\include\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\include;$(IncludePath)</IncludePath>
+    <SourcePath>C:\Users\vm\Desktop\sources\generic\src\solar\src;C:\Users\vm\Desktop\sources\generic\src\snake\src;C:\Users\vm\Desktop\sources\generic\src\rain\src;C:\Users\vm\Desktop\sources\generic\src\particles\src;C:\Users\vm\Desktop\sources\generic\src\influence_wars\src;C:\Users\vm\Desktop\sources\generic\src\base\src;C:\Users\vm\Desktop\sources\generic\src\base\src\scripts;C:\Users\vm\Desktop\sources\generic\src\base\src\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\src;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\libs;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\lua\include;C:\Users\vm\Desktop\sources\generic\vs\dependencies\include;C:\Users\vm\Desktop\sources\generic\src\solar\include;C:\Users\vm\Desktop\sources\generic\src\snake\include;C:\Users\vm\Desktop\sources\generic\src\rain\include;C:\Users\vm\Desktop\sources\generic\src\particles\include;C:\Users\vm\Desktop\sources\generic\src\other\include;C:\Users\vm\Desktop\sources\generic\src\influence_wars\include;C:\Users\vm\Desktop\sources\generic\src\base\include;C:\Users\vm\Desktop\sources\generic\src\base\include\scripts;C:\Users\vm\Desktop\sources\generic\src\base\include\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\include;$(IncludePath)</IncludePath>
+    <SourcePath>C:\Users\vm\Desktop\sources\generic\src\solar\src;C:\Users\vm\Desktop\sources\generic\src\snake\src;C:\Users\vm\Desktop\sources\generic\src\rain\src;C:\Users\vm\Desktop\sources\generic\src\particles\src;C:\Users\vm\Desktop\sources\generic\src\influence_wars\src;C:\Users\vm\Desktop\sources\generic\src\base\src;C:\Users\vm\Desktop\sources\generic\src\base\src\scripts;C:\Users\vm\Desktop\sources\generic\src\base\src\managers;C:\Users\vm\Desktop\sources\generic\src\a_star_map_demo\src;$(SourcePath)</SourcePath>
+    <LibraryPath>C:\Users\vm\Desktop\sources\generic\vs\dependencies\libs;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:[c++14|c++latest] %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:[c++14|c++latest] %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:[c++14|c++latest] %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/std:[c++14|c++latest] %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\army.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\infobox.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\map.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\map_demo.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\map_structs.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\pathfind.hpp" />
+    <ClInclude Include="..\..\..\src\a_star_map_demo\include\pathfind_utils.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\constants.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\custom_texture.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\debug_render.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\deleters.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\enums.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\graph.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\graph_node.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\managers\collision_manager.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\managers\object_manager.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\managers\resource_manager.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\managers\system_manager.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\menu.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\message_writer.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\object.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\perlin_noise.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\quaternion.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\random.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\basic_frame_animation.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\behaviour_script.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\camera.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\collider.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\dynamic_canvas.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\image.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\mask.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\render_script.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\script.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\scripts\static_canvas.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\shapes.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\state_interface.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\state_machine.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\structs.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\texture.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\texture_utils.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\transform.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\uid.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\utils.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\vector3.hpp" />
+    <ClInclude Include="..\..\..\src\base\include\vector3_utils.hpp" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\emitter.hpp" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\influence_cell.hpp" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\influence_wars.hpp" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\noise.hpp" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\PerlinNoise.h" />
+    <ClInclude Include="..\..\..\src\influence_wars\include\voronoi.hpp" />
+    <ClInclude Include="..\..\..\src\particles\include\particle.hpp" />
+    <ClInclude Include="..\..\..\src\particles\include\particles_state.hpp" />
+    <ClInclude Include="..\..\..\src\particles\include\particle_emitter.hpp" />
+    <ClInclude Include="..\..\..\src\rain\include\drop.hpp" />
+    <ClInclude Include="..\..\..\src\rain\include\light.hpp" />
+    <ClInclude Include="..\..\..\src\rain\include\rain.hpp" />
+    <ClInclude Include="..\..\..\src\snake\include\snake_game.hpp" />
+    <ClInclude Include="..\..\..\src\solar\include\background_stars.hpp" />
+    <ClInclude Include="..\..\..\src\solar\include\comet.hpp" />
+    <ClInclude Include="..\..\..\src\solar\include\orbit_render.hpp" />
+    <ClInclude Include="..\..\..\src\solar\include\planet.hpp" />
+    <ClInclude Include="..\..\..\src\solar\include\solar_system.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\a_star_map_demo\src\army.cpp" />
+    <ClCompile Include="..\..\..\src\a_star_map_demo\src\infobox.cpp" />
+    <ClCompile Include="..\..\..\src\a_star_map_demo\src\map.cpp" />
+    <ClCompile Include="..\..\..\src\a_star_map_demo\src\map_demo.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\custom_texture.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\debug_render.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\deleters.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\graph.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\graph_node.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\main.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\managers\collision_manager.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\managers\object_manager.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\managers\resource_manager.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\managers\system_manager.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\menu.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\message_writer.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\object.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\perlin_noise.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\quaternion.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\random.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\basic_frame_animation.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\camera.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\collider.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\dynamic_canvas.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\image.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\mask.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\scripts\static_canvas.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\shapes.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\state_machine.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\texture.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\texture_utils.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\transform.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\uid.cpp" />
+    <ClCompile Include="..\..\..\src\base\src\utils.cpp" />
+    <ClCompile Include="..\..\..\src\influence_wars\src\emitter.cpp" />
+    <ClCompile Include="..\..\..\src\influence_wars\src\influence_cell.cpp" />
+    <ClCompile Include="..\..\..\src\influence_wars\src\influence_wars.cpp" />
+    <ClCompile Include="..\..\..\src\influence_wars\src\PerlinNoise.cpp" />
+    <ClCompile Include="..\..\..\src\influence_wars\src\voronoi.cpp" />
+    <ClCompile Include="..\..\..\src\particles\src\particle.cpp" />
+    <ClCompile Include="..\..\..\src\particles\src\particles_state.cpp" />
+    <ClCompile Include="..\..\..\src\particles\src\particle_emitter.cpp" />
+    <ClCompile Include="..\..\..\src\rain\src\drop.cpp" />
+    <ClCompile Include="..\..\..\src\rain\src\light.cpp" />
+    <ClCompile Include="..\..\..\src\rain\src\rain.cpp" />
+    <ClCompile Include="..\..\..\src\snake\src\snake_game.cpp" />
+    <ClCompile Include="..\..\..\src\solar\src\background_stars.cpp" />
+    <ClCompile Include="..\..\..\src\solar\src\comet.cpp" />
+    <ClCompile Include="..\..\..\src\solar\src\orbit_render.cpp" />
+    <ClCompile Include="..\..\..\src\solar\src\planet.cpp" />
+    <ClCompile Include="..\..\..\src\solar\src\solar_system.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
