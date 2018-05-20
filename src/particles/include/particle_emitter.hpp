@@ -36,6 +36,7 @@ class ParticleEmitter: public BehaviourScript
 
         //<f> Particle Control
         void CreateParticle();
+        void Direction();
         //</f> /Particle Control
     protected:
         // vars and stuff
@@ -43,6 +44,9 @@ class ParticleEmitter: public BehaviourScript
     private:
     SystemManager* m_system_manager;
     std::vector<Object*> m_particles;
+    float m_direction_angle;
+    unsigned int m_number_of_particles;
+
 };
 
 #endif //PARTICLE_EMITTER_HPP

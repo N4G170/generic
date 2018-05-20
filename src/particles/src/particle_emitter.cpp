@@ -8,7 +8,7 @@
 #include "utils.hpp"
 
 //<f> Constructors & operator=
-ParticleEmitter::ParticleEmitter(SystemManager* system_manager): BehaviourScript{}, m_system_manager{system_manager}
+ParticleEmitter::ParticleEmitter(SystemManager* system_manager): BehaviourScript{}, m_system_manager{system_manager}, m_direction_angle{0}, m_number_of_particles{0}
 {
 
 }
@@ -56,10 +56,12 @@ Script* ParticleEmitter::Clone() { return new ParticleEmitter{*this}; }
 //<f> Particle Control
 void ParticleEmitter::CreateParticle()
 {
-    float base_angle{Random(0.f, 360.f)};
+    //to world
+    auto world_mouse {m_system_manager->MainCamera()->ToWorldSpace({(float)m_input_event.motion.x, (float)m_input_event.motion.y, 0})};
+
     float spread{Random(20.f, 30.f)};
-    int num_of_particles{Random(250,500)};
-    for(auto i{0}; i<num_of_particles; ++i)
+    m_number_of_particles = Random(250,500);
+    for(auto i{0}; i<m_number_of_particles; ++i)
     {
         auto particle_obj{m_system_manager->Objects()->CreateObject()};
         auto particle_img{new Image(m_system_manager)};
@@ -78,8 +80,9 @@ void ParticleEmitter::CreateParticle()
         particle_obj->AddScript(particle_script);
 
         float rotation{Random(1.f, 15.f)};
-        auto angle{ DegreesToRadians(Random(base_angle-spread, base_angle+spread)) };
+        auto angle{ DegreesToRadians(Random(m_direction_angle-spread, m_direction_angle+spread)) };
         // auto angle{ DegreesToRadians(Random(90-25.f + 180, 90+25.f + 180)) };
+        // auto angle{ DegreesToRadians(Random(0, 360)) };
         Vector3<float> direction{ std::cos(angle), std::sin(angle), 0};
         // Vector3<float> direction{ Random(-1.f, 1.f), Random(-1.f, 1.f), 0};
         float velocity{Random(1.f, 10.f) * 5};

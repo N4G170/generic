@@ -34,6 +34,8 @@ struct Bounds
             case BoundsPositions::Back_Top_Right:       return {max_x, min_y, max_z}; break;
             case BoundsPositions::Back_Bottom_Left:     return {min_x, max_y, max_z}; break;
             case BoundsPositions::Back_Bottom_Right:    return {max_x, max_y, max_z}; break;
+
+            default: return {min_x, min_y, min_z};
         }
     }
 };
